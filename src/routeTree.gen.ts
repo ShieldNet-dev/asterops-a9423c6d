@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicAgentStatusRouteImport } from './routes/api/public/agent/status'
 import { Route as ApiPublicAgentEnrollRouteImport } from './routes/api/public/agent/enroll'
 import { Route as ApiPublicAgentConfigsRouteImport } from './routes/api/public/agent/configs'
+import { Route as ApiPublicAgentCdrRouteImport } from './routes/api/public/agent/cdr'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,15 +35,22 @@ const ApiPublicAgentConfigsRoute = ApiPublicAgentConfigsRouteImport.update({
   path: '/api/public/agent/configs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAgentCdrRoute = ApiPublicAgentCdrRouteImport.update({
+  id: '/api/public/agent/cdr',
+  path: '/api/public/agent/cdr',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/agent/cdr': typeof ApiPublicAgentCdrRoute
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
   '/api/public/agent/status': typeof ApiPublicAgentStatusRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/agent/cdr': typeof ApiPublicAgentCdrRoute
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
   '/api/public/agent/status': typeof ApiPublicAgentStatusRoute
@@ -50,6 +58,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/agent/cdr': typeof ApiPublicAgentCdrRoute
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
   '/api/public/agent/status': typeof ApiPublicAgentStatusRoute
@@ -58,18 +67,21 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/api/public/agent/cdr'
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
     | '/api/public/agent/status'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/api/public/agent/cdr'
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
     | '/api/public/agent/status'
   id:
     | '__root__'
     | '/'
+    | '/api/public/agent/cdr'
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
     | '/api/public/agent/status'
@@ -77,6 +89,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicAgentCdrRoute: typeof ApiPublicAgentCdrRoute
   ApiPublicAgentConfigsRoute: typeof ApiPublicAgentConfigsRoute
   ApiPublicAgentEnrollRoute: typeof ApiPublicAgentEnrollRoute
   ApiPublicAgentStatusRoute: typeof ApiPublicAgentStatusRoute
@@ -112,11 +125,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAgentConfigsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/agent/cdr': {
+      id: '/api/public/agent/cdr'
+      path: '/api/public/agent/cdr'
+      fullPath: '/api/public/agent/cdr'
+      preLoaderRoute: typeof ApiPublicAgentCdrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicAgentCdrRoute: ApiPublicAgentCdrRoute,
   ApiPublicAgentConfigsRoute: ApiPublicAgentConfigsRoute,
   ApiPublicAgentEnrollRoute: ApiPublicAgentEnrollRoute,
   ApiPublicAgentStatusRoute: ApiPublicAgentStatusRoute,
