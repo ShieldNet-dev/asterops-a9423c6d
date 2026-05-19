@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicAgentStatusRouteImport } from './routes/api/public/agent/status'
@@ -16,6 +17,11 @@ import { Route as ApiPublicAgentEnrollRouteImport } from './routes/api/public/ag
 import { Route as ApiPublicAgentConfigsRouteImport } from './routes/api/public/agent/configs'
 import { Route as ApiPublicAgentCdrRouteImport } from './routes/api/public/agent/cdr'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -50,6 +56,7 @@ const ApiPublicAgentCdrRoute = ApiPublicAgentCdrRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/api/public/agent/cdr': typeof ApiPublicAgentCdrRoute
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/api/public/agent/cdr': typeof ApiPublicAgentCdrRoute
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/api/public/agent/cdr': typeof ApiPublicAgentCdrRoute
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
@@ -77,6 +86,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/signup'
     | '/api/public/agent/cdr'
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
@@ -85,6 +95,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/signup'
     | '/api/public/agent/cdr'
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
@@ -93,6 +104,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/login'
+    | '/signup'
     | '/api/public/agent/cdr'
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
@@ -102,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
   ApiPublicAgentCdrRoute: typeof ApiPublicAgentCdrRoute
   ApiPublicAgentConfigsRoute: typeof ApiPublicAgentConfigsRoute
   ApiPublicAgentEnrollRoute: typeof ApiPublicAgentEnrollRoute
@@ -110,6 +123,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -158,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
   ApiPublicAgentCdrRoute: ApiPublicAgentCdrRoute,
   ApiPublicAgentConfigsRoute: ApiPublicAgentConfigsRoute,
   ApiPublicAgentEnrollRoute: ApiPublicAgentEnrollRoute,
