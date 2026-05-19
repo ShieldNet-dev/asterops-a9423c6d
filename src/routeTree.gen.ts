@@ -9,38 +9,198 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCallsRouteImport } from './routes/_authenticated/calls'
+import { Route as AuthenticatedServersIndexRouteImport } from './routes/_authenticated/servers.index'
+import { Route as AuthenticatedServersIdRouteImport } from './routes/_authenticated/servers.$id'
+import { Route as ApiPublicAgentStatusRouteImport } from './routes/api/public/agent/status'
+import { Route as ApiPublicAgentEnrollRouteImport } from './routes/api/public/agent/enroll'
+import { Route as ApiPublicAgentConfigsRouteImport } from './routes/api/public/agent/configs'
+import { Route as ApiPublicAgentCdrRouteImport } from './routes/api/public/agent/cdr'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCallsRoute = AuthenticatedCallsRouteImport.update({
+  id: '/calls',
+  path: '/calls',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedServersIndexRoute =
+  AuthenticatedServersIndexRouteImport.update({
+    id: '/servers/',
+    path: '/servers/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedServersIdRoute = AuthenticatedServersIdRouteImport.update({
+  id: '/servers/$id',
+  path: '/servers/$id',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const ApiPublicAgentStatusRoute = ApiPublicAgentStatusRouteImport.update({
+  id: '/api/public/agent/status',
+  path: '/api/public/agent/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAgentEnrollRoute = ApiPublicAgentEnrollRouteImport.update({
+  id: '/api/public/agent/enroll',
+  path: '/api/public/agent/enroll',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAgentConfigsRoute = ApiPublicAgentConfigsRouteImport.update({
+  id: '/api/public/agent/configs',
+  path: '/api/public/agent/configs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAgentCdrRoute = ApiPublicAgentCdrRouteImport.update({
+  id: '/api/public/agent/cdr',
+  path: '/api/public/agent/cdr',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/calls': typeof AuthenticatedCallsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/servers/$id': typeof AuthenticatedServersIdRoute
+  '/servers/': typeof AuthenticatedServersIndexRoute
+  '/api/public/agent/cdr': typeof ApiPublicAgentCdrRoute
+  '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
+  '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
+  '/api/public/agent/status': typeof ApiPublicAgentStatusRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/calls': typeof AuthenticatedCallsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/servers/$id': typeof AuthenticatedServersIdRoute
+  '/servers': typeof AuthenticatedServersIndexRoute
+  '/api/public/agent/cdr': typeof ApiPublicAgentCdrRoute
+  '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
+  '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
+  '/api/public/agent/status': typeof ApiPublicAgentStatusRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/_authenticated/calls': typeof AuthenticatedCallsRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/servers/$id': typeof AuthenticatedServersIdRoute
+  '/_authenticated/servers/': typeof AuthenticatedServersIndexRoute
+  '/api/public/agent/cdr': typeof ApiPublicAgentCdrRoute
+  '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
+  '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
+  '/api/public/agent/status': typeof ApiPublicAgentStatusRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/calls'
+    | '/dashboard'
+    | '/servers/$id'
+    | '/servers/'
+    | '/api/public/agent/cdr'
+    | '/api/public/agent/configs'
+    | '/api/public/agent/enroll'
+    | '/api/public/agent/status'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/calls'
+    | '/dashboard'
+    | '/servers/$id'
+    | '/servers'
+    | '/api/public/agent/cdr'
+    | '/api/public/agent/configs'
+    | '/api/public/agent/enroll'
+    | '/api/public/agent/status'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/signup'
+    | '/_authenticated/calls'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/servers/$id'
+    | '/_authenticated/servers/'
+    | '/api/public/agent/cdr'
+    | '/api/public/agent/configs'
+    | '/api/public/agent/enroll'
+    | '/api/public/agent/status'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
+  ApiPublicAgentCdrRoute: typeof ApiPublicAgentCdrRoute
+  ApiPublicAgentConfigsRoute: typeof ApiPublicAgentConfigsRoute
+  ApiPublicAgentEnrollRoute: typeof ApiPublicAgentEnrollRoute
+  ApiPublicAgentStatusRoute: typeof ApiPublicAgentStatusRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +208,92 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/calls': {
+      id: '/_authenticated/calls'
+      path: '/calls'
+      fullPath: '/calls'
+      preLoaderRoute: typeof AuthenticatedCallsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/servers/': {
+      id: '/_authenticated/servers/'
+      path: '/servers'
+      fullPath: '/servers/'
+      preLoaderRoute: typeof AuthenticatedServersIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/servers/$id': {
+      id: '/_authenticated/servers/$id'
+      path: '/servers/$id'
+      fullPath: '/servers/$id'
+      preLoaderRoute: typeof AuthenticatedServersIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/public/agent/status': {
+      id: '/api/public/agent/status'
+      path: '/api/public/agent/status'
+      fullPath: '/api/public/agent/status'
+      preLoaderRoute: typeof ApiPublicAgentStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/agent/enroll': {
+      id: '/api/public/agent/enroll'
+      path: '/api/public/agent/enroll'
+      fullPath: '/api/public/agent/enroll'
+      preLoaderRoute: typeof ApiPublicAgentEnrollRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/agent/configs': {
+      id: '/api/public/agent/configs'
+      path: '/api/public/agent/configs'
+      fullPath: '/api/public/agent/configs'
+      preLoaderRoute: typeof ApiPublicAgentConfigsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/agent/cdr': {
+      id: '/api/public/agent/cdr'
+      path: '/api/public/agent/cdr'
+      fullPath: '/api/public/agent/cdr'
+      preLoaderRoute: typeof ApiPublicAgentCdrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedCallsRoute: typeof AuthenticatedCallsRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedServersIdRoute: typeof AuthenticatedServersIdRoute
+  AuthenticatedServersIndexRoute: typeof AuthenticatedServersIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedCallsRoute: AuthenticatedCallsRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedServersIdRoute: AuthenticatedServersIdRoute,
+  AuthenticatedServersIndexRoute: AuthenticatedServersIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
+  ApiPublicAgentCdrRoute: ApiPublicAgentCdrRoute,
+  ApiPublicAgentConfigsRoute: ApiPublicAgentConfigsRoute,
+  ApiPublicAgentEnrollRoute: ApiPublicAgentEnrollRoute,
+  ApiPublicAgentStatusRoute: ApiPublicAgentStatusRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
