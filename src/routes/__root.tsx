@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { AuthProvider } from "@/lib/auth";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -72,14 +74,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "AsterOps — Secure VoIP Provisioning & PBX Orchestration" },
+      {
+        name: "description",
+        content:
+          "Open-source control plane for Asterisk fleets. Automate PJSIP provisioning, enforce TLS/SRTP, and stream immutable call audit logs.",
+      },
+      { name: "author", content: "AsterOps" },
+      { property: "og:title", content: "AsterOps — Secure VoIP Provisioning" },
+      {
+        property: "og:description",
+        content:
+          "Open-source control plane for Asterisk fleets. PJSIP provisioning, TLS/SRTP, immutable call audit logs.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
@@ -113,7 +122,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <AuthProvider>
+        <Outlet />
+        <Toaster richColors theme="dark" position="bottom-right" />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
