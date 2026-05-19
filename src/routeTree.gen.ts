@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedServersIndexRouteImport } from './routes/_authenticated/servers.index'
 import { Route as ApiPublicAgentStatusRouteImport } from './routes/api/public/agent/status'
 import { Route as ApiPublicAgentEnrollRouteImport } from './routes/api/public/agent/enroll'
 import { Route as ApiPublicAgentConfigsRouteImport } from './routes/api/public/agent/configs'
@@ -43,6 +44,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedServersIndexRoute =
+  AuthenticatedServersIndexRouteImport.update({
+    id: '/servers/',
+    path: '/servers/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const ApiPublicAgentStatusRoute = ApiPublicAgentStatusRouteImport.update({
   id: '/api/public/agent/status',
   path: '/api/public/agent/status',
@@ -69,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/servers/': typeof AuthenticatedServersIndexRoute
   '/api/public/agent/cdr': typeof ApiPublicAgentCdrRoute
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
@@ -79,6 +87,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/servers': typeof AuthenticatedServersIndexRoute
   '/api/public/agent/cdr': typeof ApiPublicAgentCdrRoute
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
@@ -91,6 +100,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/servers/': typeof AuthenticatedServersIndexRoute
   '/api/public/agent/cdr': typeof ApiPublicAgentCdrRoute
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/dashboard'
+    | '/servers/'
     | '/api/public/agent/cdr'
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/dashboard'
+    | '/servers'
     | '/api/public/agent/cdr'
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
@@ -124,6 +136,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/_authenticated/dashboard'
+    | '/_authenticated/servers/'
     | '/api/public/agent/cdr'
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
@@ -178,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/servers/': {
+      id: '/_authenticated/servers/'
+      path: '/servers'
+      fullPath: '/servers/'
+      preLoaderRoute: typeof AuthenticatedServersIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/api/public/agent/status': {
       id: '/api/public/agent/status'
       path: '/api/public/agent/status'
@@ -211,10 +231,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedServersIndexRoute: typeof AuthenticatedServersIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedServersIndexRoute: AuthenticatedServersIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
