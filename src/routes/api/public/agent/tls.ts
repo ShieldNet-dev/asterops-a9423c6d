@@ -45,18 +45,22 @@ export const Route = createFileRoute("/api/public/agent/tls")({
         const parsed = AckSchema.safeParse(body);
         if (!parsed.success) return json({ error: "invalid payload" }, 400);
 
-        const updates: Record<string, unknown> = {
+        const updates = {
           state: parsed.data.state,
           last_error: parsed.data.last_error ?? null,
+          applied_at: parsed.data.state === "active" ? new Date().toISOString() : null,
+          fingerprint_sha256:
+            parsed.data.state === "active" && parsed.data.fingerprint_sha256
+              ? parsed.data.fingerprint_sha256
+              : undefined,
+          not_after:
+            parsed.data.state === "active" && parsed.data.not_after
+              ? parsed.data.not_after
+              : undefined,
         };
-        if (parsed.data.state === "active") {
-          updates.applied_at = new Date().toISOString();
-          if (parsed.data.fingerprint_sha256) updates.fingerprint_sha256 = parsed.data.fingerprint_sha256;
-          if (parsed.data.not_after) updates.not_after = parsed.data.not_after;
-        }
         const { error } = await supabaseAdmin
           .from("tls_certs")
-          .update(updates)
+          .update(updates as never)
           .eq("id", parsed.data.cert_id)
           .eq("server_id", id.serverId);
         if (error) return json({ error: error.message }, 500);
