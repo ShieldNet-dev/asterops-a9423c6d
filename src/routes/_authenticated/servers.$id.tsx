@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -27,8 +28,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ChevronLeft, Copy, Plus, Trash2, RefreshCw, Download, Send } from "lucide-react";
+import { ChevronLeft, Copy, Plus, Trash2, RefreshCw, Download, Send, Upload, ShieldCheck, AlertTriangle } from "lucide-react";
 import { StatusPill } from "./dashboard";
+import {
+  listCerts,
+  uploadCert,
+  provisionLetsEncrypt,
+  generateSelfSigned,
+  requestRenewal,
+  revokeCert,
+} from "@/lib/tls.functions";
 
 export const Route = createFileRoute("/_authenticated/servers/$id")({
   head: () => ({ meta: [{ title: "Server — AsterOps" }] }),
