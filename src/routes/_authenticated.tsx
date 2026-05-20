@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, Link, useNavigate, useRouterState } from "@tan
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { Brand } from "@/components/brand";
-import { LayoutDashboard, Server, PhoneCall, LogOut } from "lucide-react";
+import { LayoutDashboard, Server, PhoneCall, LogOut, FileClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +33,7 @@ function AuthenticatedLayout() {
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/servers", label: "Servers", icon: Server },
     { to: "/calls", label: "Call audit", icon: PhoneCall },
+    { to: "/audit", label: "Audit log", icon: FileClock },
   ] as const;
 
   return (
