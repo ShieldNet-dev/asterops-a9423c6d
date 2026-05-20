@@ -419,8 +419,8 @@ function SecurityPanel({ serverId, certExpiresAt }: { serverId: string; certExpi
                   className="font-mono text-xs"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Paste the public certificate only. The private key stays on the host — drop it at
-                  <code className="ml-1 font-mono">/etc/asterops/agent/keys/server.key</code> before submitting.
+                  Paste the public certificate (and chain) only. The private key stays on the host — drop it at
+                  <code className="ml-1 font-mono">/etc/asterisk/keys/asterisk.key</code> (mode 0600) before submitting.
                 </p>
               </div>
             </>
