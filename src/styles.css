@@ -73,9 +73,9 @@
   --card-foreground: var(--foreground);
   --popover: var(--surface);
   --popover-foreground: var(--foreground);
-  /* Asterisk brand red */
-  --brand: oklch(0.55 0.21 25);              /* ~#cf2027 */
-  --brand-foreground: oklch(0.98 0 0);
+  /* Asterisk brand orange — #F5821F */
+  --brand: oklch(0.715 0.165 52);            /* #F5821F */
+  --brand-foreground: oklch(0.16 0 0);
   --primary: var(--brand);
   --primary-foreground: var(--brand-foreground);
   --secondary: oklch(0.27 0 0);

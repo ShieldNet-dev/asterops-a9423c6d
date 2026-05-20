@@ -23,13 +23,41 @@ All endpoints are at /api/public/agent/* and require Authorization: Bearer <agen
 
 ## Reference implementation
 
-A minimal Python reference agent (~250 LOC) will live in this directory:
+A production-grade Go agent ships in this directory:
 
     agent/
-      asterops_agent.py     # main loop
-      systemd/
-        asterops-agent.service
-      install.sh
+      main.go                          # single-file daemon (~500 LOC)
+      go.mod
+      systemd/asterops-agent.service   # hardened systemd unit
+      install.sh                       # one-shot installer + enrollment
+
+Quick install on the Asterisk host (root):
+
+    curl -fsSL https://raw.githubusercontent.com/asterops/asterops/main/agent/install.sh \
+      | sudo bash -s -- \
+          --dashboard https://your-dashboard.example.com \
+          --token   ao_xxxxxxxxxxxxxxxxxxxxxx
+
+The installer builds the binary, writes `/etc/asterops/agent/config.json`,
+enrolls with the dashboard (consuming the one-time enrollment token), and
+enables the `asterops-agent` systemd service.
+
+### TLS lifecycle
+
+The agent also implements `GET/POST /api/public/agent/tls` to support:
+
+- **Uploaded PEM** — operator pastes a cert in the dashboard; agent writes
+  it to `/etc/asterisk/keys/asterisk.crt` and reloads Asterisk.
+- **Let's Encrypt** — agent runs `certbot certonly --standalone` for the
+  requested domain, symlinks the live cert into `/etc/asterisk/keys/`, and
+  reports the resulting fingerprint + `not_after` back to the dashboard.
+  Renewals are requested from the dashboard ("Renew" button) and the agent
+  runs the same flow with `--keep-until-expiring`.
+- **Self-signed** — agent generates an ECDSA P-256 cert locally for the
+  given CN.
+
+All reloads use `asterisk -rx 'core reload'` after the new files are written
+atomically via `rename(2)`, so in-progress calls are not dropped.
 
 Contributions welcome.
 

@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -27,8 +28,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ChevronLeft, Copy, Plus, Trash2, RefreshCw, Download, Send } from "lucide-react";
+import { ChevronLeft, Copy, Plus, Trash2, RefreshCw, Download, Send, Upload, ShieldCheck, AlertTriangle } from "lucide-react";
 import { StatusPill } from "./dashboard";
+import {
+  listCerts,
+  uploadCert,
+  provisionLetsEncrypt,
+  generateSelfSigned,
+  requestRenewal,
+  revokeCert,
+} from "@/lib/tls.functions";
 
 export const Route = createFileRoute("/_authenticated/servers/$id")({
   head: () => ({ meta: [{ title: "Server — AsterOps" }] }),
@@ -277,33 +286,227 @@ function PjsipPanel({ serverId }: { serverId: string }) {
 /* ---------------- Security panel ---------------- */
 
 function SecurityPanel({ serverId, certExpiresAt }: { serverId: string; certExpiresAt: string | null }) {
-  void serverId;
+  const qc = useQueryClient();
+  const fetchCerts = useServerFn(listCerts);
+  const upload = useServerFn(uploadCert);
+  const provisionLE = useServerFn(provisionLetsEncrypt);
+  const selfSign = useServerFn(generateSelfSigned);
+  const renew = useServerFn(requestRenewal);
+  const revoke = useServerFn(revokeCert);
+
+  const certsQ = useQuery({
+    queryKey: ["certs", serverId],
+    queryFn: () => fetchCerts({ data: { server_id: serverId } }),
+    refetchInterval: 10_000,
+  });
+
+  const [mode, setMode] = useState<"upload" | "letsencrypt" | "self_signed">("letsencrypt");
+  const [pem, setPem] = useState("");
+  const [domain, setDomain] = useState("");
+  const [email, setEmail] = useState("");
+
+  const expiresMs = certExpiresAt ? new Date(certExpiresAt).getTime() - Date.now() : null;
+  const expiryBadge =
+    expiresMs == null
+      ? { color: "text-muted-foreground", text: "Not provisioned" }
+      : expiresMs < 0
+      ? { color: "text-status-err", text: "EXPIRED" }
+      : expiresMs < 7 * 86400000
+      ? { color: "text-status-err", text: `Expires in ${Math.ceil(expiresMs / 86400000)} days` }
+      : expiresMs < 30 * 86400000
+      ? { color: "text-status-warn", text: `Expires in ${Math.ceil(expiresMs / 86400000)} days` }
+      : { color: "text-status-ok", text: `Expires in ${Math.ceil(expiresMs / 86400000)} days` };
+
+  async function submit() {
+    if (mode === "upload") {
+      if (!pem.includes("BEGIN CERTIFICATE")) { toast.error("Paste a PEM CERTIFICATE block"); return; }
+      const res = await upload({ data: { server_id: serverId, cert_pem: pem, domain: domain || null } });
+      if (res.error) { toast.error(res.error); return; }
+      toast.success("Certificate queued. Agent will install on next poll.");
+      setPem("");
+    } else if (mode === "letsencrypt") {
+      if (!domain || !email) { toast.error("Domain and email required"); return; }
+      const res = await provisionLE({ data: { server_id: serverId, domain, email } });
+      if (res.error) { toast.error(res.error); return; }
+      toast.success("Let's Encrypt request queued. Agent will run certbot.");
+    } else {
+      if (!domain) { toast.error("CN required"); return; }
+      const res = await selfSign({ data: { server_id: serverId, cn: domain } });
+      if (res.error) { toast.error(res.error); return; }
+      toast.success("Self-signed cert queued. Agent will generate locally.");
+    }
+    qc.invalidateQueries({ queryKey: ["certs", serverId] });
+  }
+
+  const certs = certsQ.data?.certs ?? [];
+
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-border bg-surface p-6">
-        <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">TLS certificate</h3>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <Field label="Status" value={certExpiresAt ? "Active" : "Not provisioned"} />
-          <Field
-            label="Expires"
-            value={certExpiresAt ? new Date(certExpiresAt).toLocaleString() : "—"}
-            highlight={certExpiresAt ? (new Date(certExpiresAt).getTime() - Date.now() < 14 * 86400000 ? "warn" : undefined) : undefined}
-          />
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Active certificate</h3>
+          <ShieldCheck className="size-4 text-muted-foreground" />
         </div>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <Field label="Status" value={certExpiresAt ? "Active" : "None"} />
+          <div>
+            <div className="text-xs uppercase tracking-wider text-muted-foreground">Expiry</div>
+            <div className={`mt-1 font-mono text-sm ${expiryBadge.color}`}>{expiryBadge.text}</div>
+          </div>
+          <Field label="Last seen by agent" value={certExpiresAt ? new Date(certExpiresAt).toLocaleString() : "—"} />
+        </div>
+        {expiresMs != null && expiresMs < 14 * 86400000 && (
+          <div className="mt-4 flex items-start gap-2 rounded-md border border-status-warn/30 bg-status-warn/5 p-3 text-xs text-status-warn">
+            <AlertTriangle className="size-4 shrink-0" />
+            <span>Certificate is approaching expiry. Trigger a Let's Encrypt renewal below — the agent will reload Asterisk with zero call drops.</span>
+          </div>
+        )}
         <p className="mt-4 text-xs text-muted-foreground">
-          Certificate keys are generated and stored locally by the agent. AsterOps only
-          tracks the public fingerprint and expiry — your private keys never leave the
-          host. Agents can be configured to renew via Let's Encrypt or an internal CA.
+          Private keys never leave the host — AsterOps stores the public fingerprint and lifecycle only.
         </p>
       </div>
+
+      <div className="rounded-xl border border-border bg-surface p-6">
+        <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Provision certificate</h3>
+        <div className="mt-4 flex gap-2">
+          {([
+            ["letsencrypt", "Let's Encrypt (auto-renew)"],
+            ["upload", "Upload PEM"],
+            ["self_signed", "Self-signed"],
+          ] as const).map(([k, label]) => (
+            <Button
+              key={k}
+              size="sm"
+              variant={mode === k ? "default" : "outline"}
+              onClick={() => setMode(k)}
+            >
+              {label}
+            </Button>
+          ))}
+        </div>
+
+        <div className="mt-4 space-y-3">
+          {mode !== "upload" && (
+            <div className="space-y-1">
+              <Label htmlFor="dom">{mode === "self_signed" ? "Common name (CN)" : "Domain (FQDN)"}</Label>
+              <Input id="dom" value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="sip.example.com" className="font-mono" />
+            </div>
+          )}
+          {mode === "letsencrypt" && (
+            <div className="space-y-1">
+              <Label htmlFor="em">ACME contact email</Label>
+              <Input id="em" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ops@example.com" />
+              <p className="text-xs text-muted-foreground">
+                The agent runs certbot locally over HTTP-01 (port 80 must be reachable) and reloads
+                Asterisk via <code className="font-mono">core reload</code> — no call interruptions.
+              </p>
+            </div>
+          )}
+          {mode === "upload" && (
+            <>
+              <div className="space-y-1">
+                <Label htmlFor="dom2">Domain (optional)</Label>
+                <Input id="dom2" value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="sip.example.com" className="font-mono" />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="pem">Certificate PEM (cert + chain, public only)</Label>
+                <Textarea
+                  id="pem"
+                  value={pem}
+                  onChange={(e) => setPem(e.target.value)}
+                  rows={8}
+                  placeholder="-----BEGIN CERTIFICATE-----&#10;..."
+                  className="font-mono text-xs"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Paste the public certificate (and chain) only. The private key stays on the host — drop it at
+                  <code className="ml-1 font-mono">/etc/asterisk/keys/asterisk.key</code> (mode 0600) before submitting.
+                </p>
+              </div>
+            </>
+          )}
+          <Button onClick={submit}>
+            <Upload className="mr-2 size-4" />
+            {mode === "letsencrypt" ? "Request Let's Encrypt cert" : mode === "upload" ? "Upload to agent" : "Generate self-signed"}
+          </Button>
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-xl border border-border bg-surface">
+        <div className="border-b border-border px-6 py-3 text-xs uppercase tracking-widest text-muted-foreground">
+          Certificate history
+        </div>
+        {certs.length === 0 ? (
+          <div className="px-6 py-8 text-center text-sm text-muted-foreground">No certificates yet.</div>
+        ) : (
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-border bg-surface-2 text-xs uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="px-6 py-3 font-medium">Source</th>
+                <th className="px-6 py-3 font-medium">Domain</th>
+                <th className="px-6 py-3 font-medium">State</th>
+                <th className="px-6 py-3 font-medium">Expires</th>
+                <th className="px-6 py-3 font-medium">Fingerprint</th>
+                <th className="px-6 py-3 font-medium text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border font-mono text-xs">
+              {certs.map((c: any) => (
+                <tr key={c.id}>
+                  <td className="px-6 py-3 uppercase">{c.source}</td>
+                  <td className="px-6 py-3 text-muted-foreground">{c.domain ?? "—"}</td>
+                  <td className="px-6 py-3">
+                    <CertStatePill state={c.state} />
+                  </td>
+                  <td className="px-6 py-3 text-muted-foreground">{c.not_after ? new Date(c.not_after).toLocaleDateString() : "—"}</td>
+                  <td className="px-6 py-3 text-muted-foreground truncate max-w-[160px]">{c.fingerprint_sha256?.slice(0, 16) ?? "—"}</td>
+                  <td className="px-6 py-3 text-right space-x-2">
+                    {c.state === "active" && c.source === "letsencrypt" && (
+                      <Button size="sm" variant="ghost" onClick={async () => {
+                        const res = await renew({ data: { cert_id: c.id } });
+                        if (res.error) toast.error(res.error); else toast.success("Renewal queued");
+                        qc.invalidateQueries({ queryKey: ["certs", serverId] });
+                      }}>
+                        <RefreshCw className="size-3" />
+                      </Button>
+                    )}
+                    {c.state !== "superseded" && (
+                      <Button size="sm" variant="ghost" className="text-status-err" onClick={async () => {
+                        if (!confirm("Mark this cert as superseded?")) return;
+                        const res = await revoke({ data: { cert_id: c.id } });
+                        if (res.error) toast.error(res.error); else toast.success("Revoked");
+                        qc.invalidateQueries({ queryKey: ["certs", serverId] });
+                      }}>
+                        <Trash2 className="size-3" />
+                      </Button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
       <div className="rounded-xl border border-border bg-surface p-6">
         <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">SRTP enforcement</h3>
         <p className="mt-3 text-sm text-muted-foreground">
-          SRTP enforcement is configured per-endpoint. Toggle <code className="rounded bg-background px-1 py-0.5 font-mono text-xs">Require SRTP</code> on the PJSIP tab. When enabled, the generated <code className="font-mono text-xs">pjsip.conf</code> sets <code className="font-mono text-xs">media_encryption=sdes</code> and <code className="font-mono text-xs">media_encryption_optimistic=no</code>.
+          SRTP is enforced per-endpoint via the PJSIP tab. Generated <code className="font-mono text-xs">pjsip.conf</code>
+          sets <code className="font-mono text-xs">media_encryption=sdes</code> and disables optimistic encryption.
         </p>
       </div>
     </div>
   );
+}
+
+function CertStatePill({ state }: { state: string }) {
+  const map: Record<string, string> = {
+    pending: "text-status-warn",
+    active: "text-status-ok",
+    failed: "text-status-err",
+    superseded: "text-muted-foreground",
+  };
+  return <span className={`uppercase ${map[state] ?? "text-muted-foreground"}`}>{state}</span>;
 }
 
 function Field({ label, value, highlight }: { label: string; value: string; highlight?: "warn" | "err" }) {

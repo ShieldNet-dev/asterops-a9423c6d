@@ -15,8 +15,10 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCallsRouteImport } from './routes/_authenticated/calls'
+import { Route as AuthenticatedAuditRouteImport } from './routes/_authenticated/audit'
 import { Route as AuthenticatedServersIndexRouteImport } from './routes/_authenticated/servers.index'
 import { Route as AuthenticatedServersIdRouteImport } from './routes/_authenticated/servers.$id'
+import { Route as ApiPublicAgentTlsRouteImport } from './routes/api/public/agent/tls'
 import { Route as ApiPublicAgentStatusRouteImport } from './routes/api/public/agent/status'
 import { Route as ApiPublicAgentEnrollRouteImport } from './routes/api/public/agent/enroll'
 import { Route as ApiPublicAgentConfigsRouteImport } from './routes/api/public/agent/configs'
@@ -51,6 +53,11 @@ const AuthenticatedCallsRoute = AuthenticatedCallsRouteImport.update({
   path: '/calls',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAuditRoute = AuthenticatedAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedServersIndexRoute =
   AuthenticatedServersIndexRouteImport.update({
     id: '/servers/',
@@ -61,6 +68,11 @@ const AuthenticatedServersIdRoute = AuthenticatedServersIdRouteImport.update({
   id: '/servers/$id',
   path: '/servers/$id',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+const ApiPublicAgentTlsRoute = ApiPublicAgentTlsRouteImport.update({
+  id: '/api/public/agent/tls',
+  path: '/api/public/agent/tls',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicAgentStatusRoute = ApiPublicAgentStatusRouteImport.update({
   id: '/api/public/agent/status',
@@ -87,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/audit': typeof AuthenticatedAuditRoute
   '/calls': typeof AuthenticatedCallsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/servers/$id': typeof AuthenticatedServersIdRoute
@@ -95,11 +108,13 @@ export interface FileRoutesByFullPath {
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
   '/api/public/agent/status': typeof ApiPublicAgentStatusRoute
+  '/api/public/agent/tls': typeof ApiPublicAgentTlsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/audit': typeof AuthenticatedAuditRoute
   '/calls': typeof AuthenticatedCallsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/servers/$id': typeof AuthenticatedServersIdRoute
@@ -108,6 +123,7 @@ export interface FileRoutesByTo {
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
   '/api/public/agent/status': typeof ApiPublicAgentStatusRoute
+  '/api/public/agent/tls': typeof ApiPublicAgentTlsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,6 +131,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/audit': typeof AuthenticatedAuditRoute
   '/_authenticated/calls': typeof AuthenticatedCallsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/servers/$id': typeof AuthenticatedServersIdRoute
@@ -123,6 +140,7 @@ export interface FileRoutesById {
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
   '/api/public/agent/status': typeof ApiPublicAgentStatusRoute
+  '/api/public/agent/tls': typeof ApiPublicAgentTlsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,6 +148,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/signup'
+    | '/audit'
     | '/calls'
     | '/dashboard'
     | '/servers/$id'
@@ -138,11 +157,13 @@ export interface FileRouteTypes {
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
     | '/api/public/agent/status'
+    | '/api/public/agent/tls'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/signup'
+    | '/audit'
     | '/calls'
     | '/dashboard'
     | '/servers/$id'
@@ -151,12 +172,14 @@ export interface FileRouteTypes {
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
     | '/api/public/agent/status'
+    | '/api/public/agent/tls'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/login'
     | '/signup'
+    | '/_authenticated/audit'
     | '/_authenticated/calls'
     | '/_authenticated/dashboard'
     | '/_authenticated/servers/$id'
@@ -165,6 +188,7 @@ export interface FileRouteTypes {
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
     | '/api/public/agent/status'
+    | '/api/public/agent/tls'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -176,6 +200,7 @@ export interface RootRouteChildren {
   ApiPublicAgentConfigsRoute: typeof ApiPublicAgentConfigsRoute
   ApiPublicAgentEnrollRoute: typeof ApiPublicAgentEnrollRoute
   ApiPublicAgentStatusRoute: typeof ApiPublicAgentStatusRoute
+  ApiPublicAgentTlsRoute: typeof ApiPublicAgentTlsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -222,6 +247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCallsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/audit': {
+      id: '/_authenticated/audit'
+      path: '/audit'
+      fullPath: '/audit'
+      preLoaderRoute: typeof AuthenticatedAuditRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/servers/': {
       id: '/_authenticated/servers/'
       path: '/servers'
@@ -235,6 +267,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/servers/$id'
       preLoaderRoute: typeof AuthenticatedServersIdRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/public/agent/tls': {
+      id: '/api/public/agent/tls'
+      path: '/api/public/agent/tls'
+      fullPath: '/api/public/agent/tls'
+      preLoaderRoute: typeof ApiPublicAgentTlsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/agent/status': {
       id: '/api/public/agent/status'
@@ -268,6 +307,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAuditRoute: typeof AuthenticatedAuditRoute
   AuthenticatedCallsRoute: typeof AuthenticatedCallsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedServersIdRoute: typeof AuthenticatedServersIdRoute
@@ -275,6 +315,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAuditRoute: AuthenticatedAuditRoute,
   AuthenticatedCallsRoute: AuthenticatedCallsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedServersIdRoute: AuthenticatedServersIdRoute,
@@ -294,6 +335,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAgentConfigsRoute: ApiPublicAgentConfigsRoute,
   ApiPublicAgentEnrollRoute: ApiPublicAgentEnrollRoute,
   ApiPublicAgentStatusRoute: ApiPublicAgentStatusRoute,
+  ApiPublicAgentTlsRoute: ApiPublicAgentTlsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
