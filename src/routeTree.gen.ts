@@ -17,6 +17,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCallsRouteImport } from './routes/_authenticated/calls'
 import { Route as AuthenticatedServersIndexRouteImport } from './routes/_authenticated/servers.index'
 import { Route as AuthenticatedServersIdRouteImport } from './routes/_authenticated/servers.$id'
+import { Route as ApiPublicAgentTlsRouteImport } from './routes/api/public/agent/tls'
 import { Route as ApiPublicAgentStatusRouteImport } from './routes/api/public/agent/status'
 import { Route as ApiPublicAgentEnrollRouteImport } from './routes/api/public/agent/enroll'
 import { Route as ApiPublicAgentConfigsRouteImport } from './routes/api/public/agent/configs'
@@ -62,6 +63,11 @@ const AuthenticatedServersIdRoute = AuthenticatedServersIdRouteImport.update({
   path: '/servers/$id',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const ApiPublicAgentTlsRoute = ApiPublicAgentTlsRouteImport.update({
+  id: '/api/public/agent/tls',
+  path: '/api/public/agent/tls',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicAgentStatusRoute = ApiPublicAgentStatusRouteImport.update({
   id: '/api/public/agent/status',
   path: '/api/public/agent/status',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
   '/api/public/agent/status': typeof ApiPublicAgentStatusRoute
+  '/api/public/agent/tls': typeof ApiPublicAgentTlsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
   '/api/public/agent/status': typeof ApiPublicAgentStatusRoute
+  '/api/public/agent/tls': typeof ApiPublicAgentTlsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/api/public/agent/configs': typeof ApiPublicAgentConfigsRoute
   '/api/public/agent/enroll': typeof ApiPublicAgentEnrollRoute
   '/api/public/agent/status': typeof ApiPublicAgentStatusRoute
+  '/api/public/agent/tls': typeof ApiPublicAgentTlsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
     | '/api/public/agent/status'
+    | '/api/public/agent/tls'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
     | '/api/public/agent/status'
+    | '/api/public/agent/tls'
   id:
     | '__root__'
     | '/'
@@ -165,6 +176,7 @@ export interface FileRouteTypes {
     | '/api/public/agent/configs'
     | '/api/public/agent/enroll'
     | '/api/public/agent/status'
+    | '/api/public/agent/tls'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -176,6 +188,7 @@ export interface RootRouteChildren {
   ApiPublicAgentConfigsRoute: typeof ApiPublicAgentConfigsRoute
   ApiPublicAgentEnrollRoute: typeof ApiPublicAgentEnrollRoute
   ApiPublicAgentStatusRoute: typeof ApiPublicAgentStatusRoute
+  ApiPublicAgentTlsRoute: typeof ApiPublicAgentTlsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -236,6 +249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedServersIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/api/public/agent/tls': {
+      id: '/api/public/agent/tls'
+      path: '/api/public/agent/tls'
+      fullPath: '/api/public/agent/tls'
+      preLoaderRoute: typeof ApiPublicAgentTlsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/agent/status': {
       id: '/api/public/agent/status'
       path: '/api/public/agent/status'
@@ -294,7 +314,18 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAgentConfigsRoute: ApiPublicAgentConfigsRoute,
   ApiPublicAgentEnrollRoute: ApiPublicAgentEnrollRoute,
   ApiPublicAgentStatusRoute: ApiPublicAgentStatusRoute,
+  ApiPublicAgentTlsRoute: ApiPublicAgentTlsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
