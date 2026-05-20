@@ -365,39 +365,60 @@ export type Database = {
       }
       tls_certs: {
         Row: {
+          applied_at: string | null
           cert_pem: string | null
           created_at: string
+          domain: string | null
           fingerprint_sha256: string
           id: string
           is_self_signed: boolean
           issuer: string | null
+          last_error: string | null
+          le_email: string | null
           not_after: string
           not_before: string | null
+          requested_by: string | null
           server_id: string
+          source: Database["public"]["Enums"]["cert_source"]
+          state: Database["public"]["Enums"]["cert_state"]
           subject: string
         }
         Insert: {
+          applied_at?: string | null
           cert_pem?: string | null
           created_at?: string
+          domain?: string | null
           fingerprint_sha256: string
           id?: string
           is_self_signed?: boolean
           issuer?: string | null
+          last_error?: string | null
+          le_email?: string | null
           not_after: string
           not_before?: string | null
+          requested_by?: string | null
           server_id: string
+          source?: Database["public"]["Enums"]["cert_source"]
+          state?: Database["public"]["Enums"]["cert_state"]
           subject: string
         }
         Update: {
+          applied_at?: string | null
           cert_pem?: string | null
           created_at?: string
+          domain?: string | null
           fingerprint_sha256?: string
           id?: string
           is_self_signed?: boolean
           issuer?: string | null
+          last_error?: string | null
+          le_email?: string | null
           not_after?: string
           not_before?: string | null
+          requested_by?: string | null
           server_id?: string
+          source?: Database["public"]["Enums"]["cert_source"]
+          state?: Database["public"]["Enums"]["cert_state"]
           subject?: string
         }
         Relationships: [
@@ -460,14 +481,42 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "operator" | "viewer"
       call_disposition:
         | "ANSWERED"
         | "NO_ANSWER"
@@ -476,6 +525,8 @@ export type Database = {
         | "REJECTED"
         | "CONGESTION"
         | "UNKNOWN"
+      cert_source: "uploaded" | "letsencrypt" | "self_signed"
+      cert_state: "pending" | "active" | "failed" | "superseded"
       config_state: "draft" | "pending" | "applied" | "failed" | "reverted"
       server_status: "pending" | "online" | "degraded" | "offline"
     }
@@ -605,6 +656,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "operator", "viewer"],
       call_disposition: [
         "ANSWERED",
         "NO_ANSWER",
@@ -614,6 +666,8 @@ export const Constants = {
         "CONGESTION",
         "UNKNOWN",
       ],
+      cert_source: ["uploaded", "letsencrypt", "self_signed"],
+      cert_state: ["pending", "active", "failed", "superseded"],
       config_state: ["draft", "pending", "applied", "failed", "reverted"],
       server_status: ["pending", "online", "degraded", "offline"],
     },
