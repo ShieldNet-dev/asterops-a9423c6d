@@ -283,12 +283,221 @@ function PjsipPanel({ serverId }: { serverId: string }) {
       <div className="rounded-xl border border-border bg-surface">
         <div className="flex items-center justify-between border-b border-border px-6 py-3">
           <span className="font-mono text-xs text-muted-foreground">pjsip.conf — rendered preview</span>
-          <Button size="sm" onClick={deploy}>
-            <Send className="mr-2 size-3" /> Deploy to agent
-          </Button>
+          <div className="flex items-center gap-2">
+            <RollbackButton serverId={serverId} />
+            <Button size="sm" onClick={deploy}>
+              <Send className="mr-2 size-3" /> Deploy to agent
+            </Button>
+          </div>
         </div>
         <pre className="max-h-[600px] overflow-auto bg-background p-5 font-mono text-xs leading-relaxed text-foreground">
           {previewQ.data?.rendered ?? "Loading…"}
+        </pre>
+        <VersionsList serverId={serverId} />
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- Rollback ---------------- */
+
+function RollbackButton({ serverId }: { serverId: string }) {
+  const qc = useQueryClient();
+  const fetchVersions = useServerFn(listPjsipVersions);
+  const rollback = useServerFn(rollbackPjsipConfig);
+  const q = useQuery({
+    queryKey: ["pjsip-versions", serverId],
+    queryFn: () => fetchVersions({ data: { server_id: serverId } }),
+  });
+  const applied = (q.data?.versions ?? []).filter((v: any) => v.state === "applied");
+  const previous = applied[1] ?? null;
+
+  async function onClick() {
+    if (!previous) { toast.error("No previously-applied version to roll back to"); return; }
+    if (!confirm(`Roll back to pjsip.conf v${previous.version}? The agent will reload Asterisk on next poll.`)) return;
+    const res = await rollback({ data: { server_id: serverId, target_version_id: previous.id } });
+    if (res.error) { toast.error(res.error); return; }
+    toast.success(`Rollback queued (new v${res.new_version})`);
+    qc.invalidateQueries({ queryKey: ["pjsip-versions", serverId] });
+    qc.invalidateQueries({ queryKey: ["pjsip-preview", serverId] });
+  }
+
+  return (
+    <Button size="sm" variant="outline" onClick={onClick} disabled={!previous}>
+      <RotateCcw className="mr-2 size-3" /> Rollback{previous ? ` to v${previous.version}` : ""}
+    </Button>
+  );
+}
+
+function VersionsList({ serverId }: { serverId: string }) {
+  const qc = useQueryClient();
+  const fetchVersions = useServerFn(listPjsipVersions);
+  const rollback = useServerFn(rollbackPjsipConfig);
+  const q = useQuery({
+    queryKey: ["pjsip-versions", serverId],
+    queryFn: () => fetchVersions({ data: { server_id: serverId } }),
+    refetchInterval: 15_000,
+  });
+  const versions = q.data?.versions ?? [];
+  if (versions.length === 0) return null;
+  return (
+    <div className="border-t border-border">
+      <div className="px-6 py-2 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">Version history</div>
+      <ul className="divide-y divide-border max-h-[260px] overflow-y-auto">
+        {versions.map((v: any) => (
+          <li key={v.id} className="flex items-center justify-between px-6 py-2 font-mono text-xs">
+            <div className="flex items-center gap-3">
+              <span className="text-foreground">v{v.version}</span>
+              <span className={`uppercase ${
+                v.state === "applied" ? "text-status-ok" :
+                v.state === "failed" ? "text-status-err" :
+                v.state === "pending" ? "text-status-warn" : "text-muted-foreground"
+              }`}>{v.state}</span>
+              <span className="text-muted-foreground">{new Date(v.created_at).toLocaleString()}</span>
+              {v.notes && <span className="text-muted-foreground italic">· {v.notes}</span>}
+            </div>
+            {v.state === "applied" && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={async () => {
+                  if (!confirm(`Roll back to v${v.version}?`)) return;
+                  const res = await rollback({ data: { server_id: serverId, target_version_id: v.id } });
+                  if (res.error) { toast.error(res.error); return; }
+                  toast.success(`Rollback queued (new v${res.new_version})`);
+                  qc.invalidateQueries({ queryKey: ["pjsip-versions", serverId] });
+                }}
+              >
+                <RotateCcw className="size-3" />
+              </Button>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/* ---------------- Alerts panel ---------------- */
+
+function AlertsPanel({
+  serverId,
+  webhookUrl,
+  alertEmail,
+  warnDays,
+  criticalDays,
+}: {
+  serverId: string;
+  webhookUrl: string | null;
+  alertEmail: string | null;
+  warnDays: number;
+  criticalDays: number;
+}) {
+  const qc = useQueryClient();
+  const update = useServerFn(updateAlertingConfig);
+  const test = useServerFn(sendTestAlert);
+  const [webhook, setWebhook] = useState(webhookUrl ?? "");
+  const [email, setEmail] = useState(alertEmail ?? "");
+  const [warn, setWarn] = useState(warnDays);
+  const [critical, setCritical] = useState(criticalDays);
+
+  async function save() {
+    const res = await update({
+      data: {
+        server_id: serverId,
+        webhook_url: webhook.trim() || null,
+        alert_email: email.trim() || null,
+        cert_warn_days: warn,
+        cert_critical_days: critical,
+      },
+    });
+    if (res.error) { toast.error(res.error); return; }
+    toast.success("Alert settings saved");
+    qc.invalidateQueries({ queryKey: ["server", serverId] });
+  }
+
+  async function testNow() {
+    const res = await test({ data: { server_id: serverId } });
+    if (res.error) { toast.error(res.error); return; }
+    toast.success("Test alert dispatched");
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-xl border border-border bg-surface p-6">
+        <div className="flex items-center gap-2">
+          <Bell className="size-4 text-brand" />
+          <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Real-time alert delivery</h3>
+        </div>
+        <p className="mt-2 text-sm text-muted-foreground">
+          AsterOps posts a JSON payload to your webhook whenever a TLS provisioning or
+          PJSIP reload fails on this server. Email is included in the payload for downstream relays.
+        </p>
+
+        <div className="mt-6 space-y-4">
+          <div className="space-y-1">
+            <Label htmlFor="wh">Webhook URL (https)</Label>
+            <div className="flex gap-2">
+              <Input
+                id="wh"
+                type="url"
+                value={webhook}
+                onChange={(e) => setWebhook(e.target.value)}
+                placeholder="https://hooks.example.com/asterops"
+                className="font-mono text-xs"
+              />
+              <Button variant="outline" onClick={testNow} disabled={!webhook}>
+                <Webhook className="mr-2 size-3" /> Test
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Compatible with Slack, Discord, n8n, Make, custom HTTPS endpoints.
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="em">Alert email (included in webhook payload)</Label>
+            <Input
+              id="em"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="oncall@example.com"
+            />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-1">
+              <Label htmlFor="warn">Cert WARN threshold (days)</Label>
+              <Input id="warn" type="number" min={1} max={180} value={warn} onChange={(e) => setWarn(parseInt(e.target.value || "0", 10))} />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="crit">Cert CRITICAL threshold (days)</Label>
+              <Input id="crit" type="number" min={1} max={60} value={critical} onChange={(e) => setCritical(parseInt(e.target.value || "0", 10))} />
+            </div>
+          </div>
+
+          <Button onClick={save}>Save settings</Button>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-border bg-surface p-6">
+        <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Webhook payload</h3>
+        <pre className="mt-3 overflow-x-auto rounded-md bg-background p-4 font-mono text-[11px] leading-relaxed text-muted-foreground">
+{`POST <your-webhook>
+content-type: application/json
+x-asterops-event: tls.provision_failed
+
+{
+  "id": "…",
+  "server": { "id": "…", "name": "pbx-fra-01" },
+  "kind": "tls.provision_failed",
+  "severity": "critical",
+  "title": "TLS certificate provisioning failed",
+  "message": "certbot: dns-01 challenge failed",
+  "meta": { "cert_id": "…" },
+  "timestamp": "2026-05-21T09:14:22.000Z"
+}`}
         </pre>
       </div>
     </div>
