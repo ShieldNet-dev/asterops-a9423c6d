@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { authenticateAgent, json } from "@/lib/agent-auth.server";
+import { fireAlert } from "@/lib/alerts.server";
 
 const AckSchema = z.object({
   cert_id: z.string().uuid(),
@@ -85,6 +86,17 @@ export const Route = createFileRoute("/api/public/agent/tls")({
           target_id: parsed.data.cert_id,
           meta: { last_error: parsed.data.last_error ?? null },
         });
+
+        if (parsed.data.state === "failed") {
+          await fireAlert({
+            serverId: id.serverId,
+            kind: "tls.provision_failed",
+            severity: "critical",
+            title: "TLS certificate provisioning failed",
+            message: parsed.data.last_error || "Agent reported the certificate could not be installed.",
+            meta: { cert_id: parsed.data.cert_id },
+          });
+        }
         return json({ ok: true });
       },
     },

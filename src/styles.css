@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Sora:wght@500;600;700;800&display=swap");
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -6,8 +6,10 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * AsterOps design system — engineering dark mode.
- * Single accent = Asterisk red. No gradients. Monospace for technical content.
+ * AsterOps design system.
+ * Telecom control-plane aesthetic: light by default, dark on demand,
+ * Asterisk orange accent (#F5821F), Sora display + Inter body + JetBrains
+ * Mono for technical identifiers. Subtle waveform/grid textures.
  */
 
 @theme inline {
@@ -59,52 +61,87 @@
   --color-status-warn: var(--status-warn);
   --color-status-err: var(--status-err);
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-display: "Sora", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 :root {
-  /* Dark-by-default — there is no light theme. */
-  --radius: 0.5rem;
-  --background: oklch(0.16 0 0);             /* #09090b */
-  --foreground: oklch(0.92 0 0);             /* zinc-200 */
-  --surface: oklch(0.20 0 0);                /* #121214 */
-  --surface-2: oklch(0.235 0 0);             /* zinc-900 */
+  /* LIGHT theme (default) — warm paper white with deep slate ink. */
+  --radius: 0.625rem;
+  --background: oklch(0.985 0.004 80);        /* near-white, warm */
+  --foreground: oklch(0.22 0.02 250);          /* deep slate */
+  --surface: oklch(1 0 0);                     /* card white */
+  --surface-2: oklch(0.965 0.006 75);          /* subtle wash */
   --card: var(--surface);
   --card-foreground: var(--foreground);
   --popover: var(--surface);
   --popover-foreground: var(--foreground);
-  /* Asterisk brand orange — #F5821F */
-  --brand: oklch(0.715 0.165 52);            /* #F5821F */
-  --brand-foreground: oklch(0.16 0 0);
+  /* Asterisk orange — #F5821F */
+  --brand: oklch(0.715 0.165 52);
+  --brand-foreground: oklch(1 0 0);
+  --brand-soft: oklch(0.715 0.165 52 / 0.12);
   --primary: var(--brand);
   --primary-foreground: var(--brand-foreground);
-  --secondary: oklch(0.27 0 0);
+  --secondary: oklch(0.95 0.006 250);
   --secondary-foreground: var(--foreground);
-  --muted: oklch(0.27 0 0);
-  --muted-foreground: oklch(0.62 0 0);
-  --accent: oklch(0.27 0 0);
+  --muted: oklch(0.955 0.006 250);
+  --muted-foreground: oklch(0.5 0.02 250);
+  --accent: oklch(0.955 0.01 75);
   --accent-foreground: var(--foreground);
   --destructive: oklch(0.62 0.22 26);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.28 0 0);                 /* #27272a */
-  --input: oklch(0.28 0 0);
+  --border: oklch(0.91 0.008 250);
+  --input: oklch(0.92 0.008 250);
   --ring: var(--brand);
-  --status-ok: oklch(0.72 0.17 158);         /* emerald-500 */
-  --status-warn: oklch(0.78 0.16 80);        /* amber */
-  --status-err: oklch(0.65 0.22 25);         /* red */
+  --status-ok: oklch(0.62 0.16 158);
+  --status-warn: oklch(0.7 0.16 70);
+  --status-err: oklch(0.6 0.22 25);
   --chart-1: var(--brand);
-  --chart-2: oklch(0.72 0.17 158);
-  --chart-3: oklch(0.78 0.16 80);
-  --chart-4: oklch(0.62 0.15 250);
-  --chart-5: oklch(0.55 0 0);
-  --sidebar: oklch(0.18 0 0);
+  --chart-2: oklch(0.62 0.16 158);
+  --chart-3: oklch(0.7 0.16 70);
+  --chart-4: oklch(0.55 0.18 250);
+  --chart-5: oklch(0.5 0.02 250);
+  --sidebar: oklch(0.98 0.005 80);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--brand);
   --sidebar-primary-foreground: var(--brand-foreground);
-  --sidebar-accent: oklch(0.24 0 0);
+  --sidebar-accent: var(--accent);
   --sidebar-accent-foreground: var(--foreground);
   --sidebar-border: var(--border);
   --sidebar-ring: var(--brand);
+  color-scheme: light;
+}
+
+.dark {
+  /* DARK theme — control-room console with warm orange accent. */
+  --background: oklch(0.17 0.012 250);
+  --foreground: oklch(0.94 0.005 80);
+  --surface: oklch(0.205 0.014 250);
+  --surface-2: oklch(0.235 0.016 250);
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface);
+  --popover-foreground: var(--foreground);
+  --brand: oklch(0.74 0.16 52);
+  --brand-foreground: oklch(0.18 0.012 250);
+  --brand-soft: oklch(0.74 0.16 52 / 0.18);
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
+  --secondary: oklch(0.27 0.014 250);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.27 0.014 250);
+  --muted-foreground: oklch(0.66 0.01 250);
+  --accent: oklch(0.27 0.014 250);
+  --accent-foreground: var(--foreground);
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.3 0.012 250);
+  --input: oklch(0.3 0.012 250);
+  --ring: var(--brand);
+  --status-ok: oklch(0.74 0.16 158);
+  --status-warn: oklch(0.78 0.16 80);
+  --status-err: oklch(0.68 0.22 25);
+  --sidebar: oklch(0.185 0.012 250);
   color-scheme: dark;
 }
 
@@ -138,4 +175,31 @@
   .bg-status-ok { background-color: var(--status-ok); }
   .bg-status-warn { background-color: var(--status-warn); }
   .bg-status-err { background-color: var(--status-err); }
+  .font-display { font-family: var(--font-display); }
+  .bg-brand-soft { background-color: var(--brand-soft); }
+
+  /* Subtle grid + glow for hero / panels. */
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .bg-radial-brand {
+    background:
+      radial-gradient(60% 50% at 80% 0%, color-mix(in oklab, var(--brand) 22%, transparent) 0%, transparent 60%),
+      radial-gradient(50% 60% at 0% 100%, color-mix(in oklab, var(--brand) 12%, transparent) 0%, transparent 60%);
+  }
+
+  @keyframes pulse-ring {
+    0%   { transform: scale(0.85); opacity: 0.9; }
+    100% { transform: scale(2.4); opacity: 0; }
+  }
+  .animate-pulse-ring { animation: pulse-ring 2.2s ease-out infinite; }
+
+  @keyframes wave {
+    0%, 100% { transform: scaleY(0.35); }
+    50%      { transform: scaleY(1); }
+  }
+  .animate-wave { animation: wave 1.2s ease-in-out infinite; transform-origin: center; }
 }

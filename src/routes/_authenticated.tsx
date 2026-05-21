@@ -2,8 +2,9 @@ import { createFileRoute, Outlet, Link, useNavigate, useRouterState } from "@tan
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { Brand } from "@/components/brand";
-import { LayoutDashboard, Server, PhoneCall, LogOut, FileClock } from "lucide-react";
+import { LayoutDashboard, Server, PhoneCall, LogOut, FileClock, Activity, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -32,7 +33,9 @@ function AuthenticatedLayout() {
   const navItems = [
     { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/servers", label: "Servers", icon: Server },
+    { to: "/agents", label: "Agent health", icon: Activity },
     { to: "/calls", label: "Call audit", icon: PhoneCall },
+    { to: "/alerts", label: "Alerts", icon: Bell },
     { to: "/audit", label: "Audit log", icon: FileClock },
   ] as const;
 
@@ -79,9 +82,12 @@ function AuthenticatedLayout() {
       <div className="md:pl-60">
         <header className="flex h-16 items-center justify-between border-b border-border px-6 md:px-8">
           <div className="md:hidden"><Brand size="sm" /></div>
-          <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="size-1.5 rounded-full bg-status-ok" />
-            Control plane operational
+          <div className="ml-auto flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="hidden items-center gap-2 md:flex">
+              <span className="size-1.5 rounded-full bg-status-ok" />
+              Control plane operational
+            </span>
+            <ThemeToggle />
           </div>
         </header>
         <main className="px-6 py-8 md:px-8 md:py-10">
