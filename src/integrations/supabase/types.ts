@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_reloads: {
+        Row: {
+          config_id: string | null
+          config_version: number | null
+          created_at: string
+          id: string
+          notes: string | null
+          outcome: string
+          server_id: string
+        }
+        Insert: {
+          config_id?: string | null
+          config_version?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          outcome: string
+          server_id: string
+        }
+        Update: {
+          config_id?: string | null
+          config_version?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          outcome?: string
+          server_id?: string
+        }
+        Relationships: []
+      }
       audit_events: {
         Row: {
           action: string
@@ -238,6 +268,51 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          delivered_email: boolean
+          delivered_webhook: boolean
+          id: string
+          kind: string
+          message: string | null
+          meta: Json
+          server_id: string | null
+          severity: string
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          delivered_email?: boolean
+          delivered_webhook?: boolean
+          id?: string
+          kind: string
+          message?: string | null
+          meta?: Json
+          server_id?: string | null
+          severity: string
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          delivered_email?: boolean
+          delivered_webhook?: boolean
+          id?: string
+          kind?: string
+          message?: string | null
+          meta?: Json
+          server_id?: string | null
+          severity?: string
+          title?: string
+        }
+        Relationships: []
+      }
       pjsip_configs: {
         Row: {
           applied_at: string | null
@@ -311,8 +386,11 @@ export type Database = {
           active_calls: number
           agent_token_hash: string | null
           agent_version: string | null
+          alert_email: string | null
           asterisk_version: string | null
+          cert_critical_days: number
           cert_expires_at: string | null
+          cert_warn_days: number
           created_at: string
           description: string | null
           enrollment_token_hash: string | null
@@ -324,13 +402,17 @@ export type Database = {
           region: string | null
           status: Database["public"]["Enums"]["server_status"]
           updated_at: string
+          webhook_url: string | null
         }
         Insert: {
           active_calls?: number
           agent_token_hash?: string | null
           agent_version?: string | null
+          alert_email?: string | null
           asterisk_version?: string | null
+          cert_critical_days?: number
           cert_expires_at?: string | null
+          cert_warn_days?: number
           created_at?: string
           description?: string | null
           enrollment_token_hash?: string | null
@@ -342,13 +424,17 @@ export type Database = {
           region?: string | null
           status?: Database["public"]["Enums"]["server_status"]
           updated_at?: string
+          webhook_url?: string | null
         }
         Update: {
           active_calls?: number
           agent_token_hash?: string | null
           agent_version?: string | null
+          alert_email?: string | null
           asterisk_version?: string | null
+          cert_critical_days?: number
           cert_expires_at?: string | null
+          cert_warn_days?: number
           created_at?: string
           description?: string | null
           enrollment_token_hash?: string | null
@@ -360,6 +446,7 @@ export type Database = {
           region?: string | null
           status?: Database["public"]["Enums"]["server_status"]
           updated_at?: string
+          webhook_url?: string | null
         }
         Relationships: []
       }
