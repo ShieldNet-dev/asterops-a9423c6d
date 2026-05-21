@@ -28,7 +28,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { ChevronLeft, Copy, Plus, Trash2, RefreshCw, Download, Send, Upload, ShieldCheck, AlertTriangle } from "lucide-react";
+import { ChevronLeft, Copy, Plus, Trash2, RefreshCw, Download, Send, Upload, ShieldCheck, AlertTriangle, RotateCcw, Bell, Webhook } from "lucide-react";
 import { StatusPill } from "./dashboard";
 import {
   listCerts,
@@ -38,6 +38,8 @@ import {
   requestRenewal,
   revokeCert,
 } from "@/lib/tls.functions";
+import { listPjsipVersions, rollbackPjsipConfig } from "@/lib/rollback.functions";
+import { updateAlertingConfig, sendTestAlert } from "@/lib/alerts.functions";
 
 export const Route = createFileRoute("/_authenticated/servers/$id")({
   head: () => ({ meta: [{ title: "Server — AsterOps" }] }),
@@ -111,6 +113,7 @@ function ServerDetail() {
           <TabsTrigger value="pjsip">PJSIP</TabsTrigger>
           <TabsTrigger value="security">TLS &amp; SRTP</TabsTrigger>
           <TabsTrigger value="hardening">Hardening</TabsTrigger>
+          <TabsTrigger value="alerts">Alerts</TabsTrigger>
           <TabsTrigger value="calls">Calls</TabsTrigger>
         </TabsList>
         <TabsContent value="pjsip" className="mt-6">
@@ -121,6 +124,15 @@ function ServerDetail() {
         </TabsContent>
         <TabsContent value="hardening" className="mt-6">
           <HardeningPanel serverId={id} />
+        </TabsContent>
+        <TabsContent value="alerts" className="mt-6">
+          <AlertsPanel
+            serverId={id}
+            webhookUrl={(server as any).webhook_url ?? null}
+            alertEmail={(server as any).alert_email ?? null}
+            warnDays={(server as any).cert_warn_days ?? 14}
+            criticalDays={(server as any).cert_critical_days ?? 3}
+          />
         </TabsContent>
         <TabsContent value="calls" className="mt-6">
           <ServerCallsPanel serverId={id} />
