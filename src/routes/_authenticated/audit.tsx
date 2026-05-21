@@ -33,17 +33,19 @@ function AuditPage() {
   const [serverId, setServerId] = useState<string>("all");
   const [actorId, setActorId] = useState("");
   const [action, setAction] = useState("");
+  const [role, setRole] = useState<string>("all");
   const [since, setSince] = useState("");
   const [until, setUntil] = useState("");
 
   const q = useQuery({
-    queryKey: ["audit", serverId, actorId, action, since, until],
+    queryKey: ["audit", serverId, actorId, action, role, since, until],
     queryFn: () =>
       fetchEvents({
         data: {
           server_id: serverId === "all" ? null : serverId,
           actor_id: actorId || null,
           action: action || null,
+          role: role === "all" ? null : (role as "admin" | "operator" | "viewer"),
           since: since ? new Date(since).toISOString() : null,
           until: until ? new Date(until).toISOString() : null,
           limit: 500,
@@ -54,25 +56,33 @@ function AuditPage() {
   const events = q.data?.events ?? [];
   const isAdmin = roleQ.data?.isAdmin ?? false;
 
-  const csvHref = useMemo(() => {
-    const header = "created_at,action,actor_id,server_id,server_name,target_type,target_id,meta";
+  // CSV reflects EXACTLY the rows currently shown (after every active filter).
+  const csvBlob = useMemo(() => {
+    const header = ["created_at", "action", "actor_id", "server_id", "server_name", "target_type", "target_id", "meta"];
+    const escape = (v: unknown) => {
+      const s = v == null ? "" : typeof v === "string" ? v : JSON.stringify(v);
+      const safe = s.replace(/"/g, '""');
+      return /[",\n\r]/.test(safe) ? `"${safe}"` : safe;
+    };
     const rows = events.map((e: any) =>
-      [
-        e.created_at,
-        e.action,
-        e.actor_id ?? "",
-        e.server_id ?? "",
-        e.servers?.name ?? "",
-        e.target_type ?? "",
-        e.target_id ?? "",
-        JSON.stringify(e.meta ?? {}),
-      ]
-        .map((v) => String(v).replace(/"/g, '""'))
-        .map((v) => (v.includes(",") || v.includes('"') ? `"${v}"` : v))
+      [e.created_at, e.action, e.actor_id ?? "", e.server_id ?? "", e.servers?.name ?? "", e.target_type ?? "", e.target_id ?? "", e.meta ?? {}]
+        .map(escape)
         .join(","),
     );
-    return "data:text/csv;charset=utf-8," + encodeURIComponent([header, ...rows].join("\n"));
+    return [header.join(","), ...rows].join("\r\n");
   }, [events]);
+
+  function exportCsv() {
+    const blob = new Blob([csvBlob], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    const scope = serverId === "all" ? "all" : (serversQ.data?.servers ?? []).find((s) => s.id === serverId)?.name ?? "scoped";
+    a.href = url;
+    a.download = `asterops-audit_${scope}_${stamp}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div className="space-y-8">
@@ -94,18 +104,13 @@ function AuditPage() {
               <Lock className="mr-1 size-3" /> Scoped to your servers
             </Badge>
           )}
-          <a
-            href={csvHref}
-            download={`asterops-audit-${new Date().toISOString().slice(0, 10)}.csv`}
-          >
-            <Button variant="outline" size="sm" disabled={events.length === 0}>
-              <Download className="mr-2 size-3" /> Export CSV ({events.length})
-            </Button>
-          </a>
+          <Button variant="outline" size="sm" disabled={events.length === 0} onClick={exportCsv}>
+            <Download className="mr-2 size-3" /> Export CSV ({events.length})
+          </Button>
         </div>
       </div>
 
-      <div className="grid gap-3 rounded-xl border border-border bg-surface p-4 md:grid-cols-5">
+      <div className="grid gap-3 rounded-xl border border-border bg-surface p-4 md:grid-cols-6">
         <div className="space-y-1">
           <label className="text-xs uppercase tracking-wider text-muted-foreground">Server</label>
           <Select value={serverId} onValueChange={setServerId}>
@@ -115,6 +120,18 @@ function AuditPage() {
               {(serversQ.data?.servers ?? []).map((s) => (
                 <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs uppercase tracking-wider text-muted-foreground">User role</label>
+          <Select value={role} onValueChange={setRole} disabled={!isAdmin}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All roles</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="operator">Operator</SelectItem>
+              <SelectItem value="viewer">Viewer</SelectItem>
             </SelectContent>
           </Select>
         </div>
