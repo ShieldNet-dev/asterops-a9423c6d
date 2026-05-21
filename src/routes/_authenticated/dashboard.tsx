@@ -3,8 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { listServers } from "@/lib/servers.functions";
 import { callStats } from "@/lib/calls.functions";
-import { ArrowRight, Server, ShieldCheck, PhoneCall, Lock } from "lucide-react";
+import { certExpirySummary, listNotifications } from "@/lib/alerts.functions";
+import { ArrowRight, Server, ShieldCheck, PhoneCall, Lock, ShieldAlert, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — AsterOps" }] }),
@@ -14,18 +16,30 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 function DashboardPage() {
   const fetchServers = useServerFn(listServers);
   const fetchStats = useServerFn(callStats);
+  const fetchCerts = useServerFn(certExpirySummary);
+  const fetchNotes = useServerFn(listNotifications);
 
   const serversQ = useQuery({ queryKey: ["servers"], queryFn: () => fetchServers() });
   const statsQ = useQuery({ queryKey: ["call-stats"], queryFn: () => fetchStats() });
+  const certsQ = useQuery({ queryKey: ["cert-summary"], queryFn: () => fetchCerts(), refetchInterval: 60_000 });
+  const notesQ = useQuery({
+    queryKey: ["notifications", true],
+    queryFn: () => fetchNotes({ data: { only_unacked: true } }),
+    refetchInterval: 30_000,
+  });
 
   const servers = serversQ.data?.servers ?? [];
   const online = servers.filter((s) => s.status === "online").length;
   const pending = servers.filter((s) => s.status === "pending").length;
 
+  const certItems = certsQ.data?.items ?? [];
+  const certAlerts = certItems.filter((i: any) => ["critical", "expired", "warn"].includes(i.severity));
+  const notes = (notesQ.data?.notifications ?? []).slice(0, 6);
+
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="font-display text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Fleet-wide status across all registered Asterisk hosts.
         </p>
@@ -36,6 +50,60 @@ function DashboardPage() {
         <StatCard label="Calls (24h)" value={statsQ.data?.total24h ?? 0} icon={PhoneCall} sub={`${statsQ.data?.answered24h ?? 0} answered`} />
         <StatCard label="Encrypted (24h)" value={statsQ.data?.encrypted24h ?? 0} icon={Lock} sub="TLS / SRTP" />
         <StatCard label="Avg duration" value={fmtDuration(statsQ.data?.avgDurationSec ?? 0)} icon={ShieldCheck} sub="last 24h" />
+      </div>
+
+      {/* Alerts row */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <section className="rounded-xl border border-border bg-surface">
+          <div className="flex items-center justify-between border-b border-border px-5 py-3">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              <ShieldAlert className="size-4" /> Certificate expiry
+            </div>
+            <Link to="/alerts"><Button variant="ghost" size="sm">All alerts <ArrowRight className="ml-1 size-3" /></Button></Link>
+          </div>
+          {certAlerts.length === 0 ? (
+            <div className="px-5 py-8 text-center text-sm text-muted-foreground">All certificates healthy.</div>
+          ) : (
+            <ul className="divide-y divide-border">
+              {certAlerts.slice(0, 5).map((c: any) => (
+                <li key={c.id} className="flex items-center justify-between px-5 py-3 text-sm">
+                  <Link to="/servers/$id" params={{ id: c.id }} className="hover:text-brand">{c.name}</Link>
+                  <span className={`font-mono text-xs ${c.severity === "warn" ? "text-status-warn" : "text-status-err"}`}>
+                    {c.severity === "expired" ? "EXPIRED" : `${c.days_remaining}d remaining`}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className="rounded-xl border border-border bg-surface">
+          <div className="flex items-center justify-between border-b border-border px-5 py-3">
+            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              <Bell className="size-4" /> Unacknowledged alerts
+            </div>
+            <Link to="/alerts"><Button variant="ghost" size="sm">Open <ArrowRight className="ml-1 size-3" /></Button></Link>
+          </div>
+          {notes.length === 0 ? (
+            <div className="px-5 py-8 text-center text-sm text-muted-foreground">No open alerts.</div>
+          ) : (
+            <ul className="divide-y divide-border">
+              {notes.map((n: any) => (
+                <li key={n.id} className="flex items-start justify-between gap-3 px-5 py-3 text-sm">
+                  <div className="min-w-0">
+                    <div className="truncate text-foreground">{n.title}</div>
+                    <div className="mt-0.5 text-[11px] text-muted-foreground">
+                      {n.servers?.name ? `${n.servers.name} · ` : ""}{new Date(n.created_at).toLocaleString()}
+                    </div>
+                  </div>
+                  <Badge variant="outline" className={`shrink-0 font-mono text-[10px] ${
+                    n.severity === "critical" ? "text-status-err" : n.severity === "warn" ? "text-status-warn" : "text-muted-foreground"
+                  }`}>{n.severity}</Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </div>
 
       <section className="rounded-xl border border-border bg-surface">
