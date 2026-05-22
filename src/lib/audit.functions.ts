@@ -50,5 +50,30 @@ export const listAuditEvents = createServerFn({ method: "POST" })
     if (data.until) q = q.lte("created_at", data.until);
     const { data: rows, error } = await q;
     if (error) return { events: [], isAdmin, error: error.message };
-    return { events: rows ?? [], isAdmin, error: null };
+
+    // Attach the actor's primary role to each event so CSV exports match the
+    // visible "User role" filter exactly. Admins see roles for every actor;
+    // non-admins only ever see their own actions, so we only need their role.
+    const actorIds = Array.from(
+      new Set((rows ?? []).map((r: any) => r.actor_id).filter(Boolean)),
+    ) as string[];
+    let roleByActor: Record<string, string> = {};
+    if (actorIds.length > 0) {
+      const { data: ru } = await supabase
+        .from("user_roles")
+        .select("user_id, role")
+        .in("user_id", actorIds);
+      for (const r of ru ?? []) {
+        // Priority: admin > operator > viewer
+        const cur = roleByActor[(r as any).user_id];
+        const next = (r as any).role as string;
+        const rank = (x: string) => (x === "admin" ? 3 : x === "operator" ? 2 : 1);
+        if (!cur || rank(next) > rank(cur)) roleByActor[(r as any).user_id] = next;
+      }
+    }
+    const events = (rows ?? []).map((r: any) => ({
+      ...r,
+      actor_role: r.actor_id ? roleByActor[r.actor_id] ?? null : null,
+    }));
+    return { events, isAdmin, error: null };
   });
