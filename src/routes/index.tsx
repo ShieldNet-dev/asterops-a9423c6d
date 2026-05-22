@@ -6,7 +6,6 @@ import {
   ShieldCheck,
   ScrollText,
   Server,
-  Terminal,
   GitBranch,
   Lock,
   PhoneCall,
@@ -15,6 +14,9 @@ import {
   Radio,
   Activity,
   CheckCircle2,
+  Cloud,
+  Headphones,
+  Cable,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -34,14 +36,14 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur">
+      <header className="sticky top-0 z-50 border-b border-border bg-background">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <Brand size="md" />
           <nav className="hidden gap-8 text-sm font-medium text-muted-foreground md:flex">
             <a href="#capabilities" className="transition-colors hover:text-foreground">Capabilities</a>
+            <a href="#flow" className="transition-colors hover:text-foreground">Call flow</a>
             <a href="#how" className="transition-colors hover:text-foreground">How it works</a>
             <a href="#install" className="transition-colors hover:text-foreground">Install</a>
-            <a href="#audit" className="transition-colors hover:text-foreground">Audit</a>
           </nav>
           <div className="flex items-center gap-1">
             <ThemeToggle />
@@ -58,29 +60,25 @@ function Index() {
         </div>
       </header>
 
-      {/* HERO */}
-      <section className="relative overflow-hidden border-b border-border">
-        <div className="absolute inset-0 bg-grid opacity-60" aria-hidden />
-        <div className="absolute inset-0 bg-radial-brand" aria-hidden />
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-6 py-20 md:grid-cols-[1.05fr_1fr] md:items-center md:py-28">
+      {/* HERO — flat surface, no gradient, no tile background. */}
+      <section className="border-b border-border bg-background">
+        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 md:grid-cols-[1.05fr_1fr] md:items-center md:py-24">
           <div>
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-brand-soft px-3 py-1 text-xs font-medium text-brand">
-              <Radio className="size-3" /> Open-source · MIT · for Asterisk 18 / 20 / 21
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted-foreground">
+              <Radio className="size-3 text-brand" /> Open-source · MIT · Asterisk 18 / 20 / 21
             </div>
-            <h1 className="font-display text-5xl font-bold leading-[1.05] tracking-tight md:text-6xl">
-              Provision, harden and audit your{" "}
-              <span className="text-brand">VoIP fleet</span>{" "}
-              without touching a config file.
+            <h1 className="font-display text-5xl font-bold leading-[1.05] tracking-tight text-foreground md:text-6xl">
+              Run a hardened VoIP fleet without touching a config file.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              AsterOps is a control plane for production Asterisk PBX servers.
+              AsterOps is an open control plane for production Asterisk PBX servers.
               Generate <span className="font-mono text-foreground">pjsip.conf</span> from a form,
-              enforce TLS&nbsp;1.3 + SRTP on every endpoint, and stream tamper-proof
-              call records — from one dashboard, across every host.
+              enforce TLS&nbsp;1.3 + SRTP on every SIP endpoint, and stream tamper-proof
+              call records — across every host, from one dashboard.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-3">
               <Link to="/signup">
-                <Button size="lg" className="shadow-lg shadow-brand/20">
+                <Button size="lg">
                   Launch dashboard <ArrowRight className="ml-2 size-4" />
                 </Button>
               </Link>
@@ -88,7 +86,7 @@ function Index() {
                 <Button size="lg" variant="outline">Install the agent</Button>
               </a>
             </div>
-            <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-2 text-xs text-muted-foreground">
+            <div className="mt-10 grid max-w-md grid-cols-2 gap-x-6 gap-y-2 text-xs text-muted-foreground">
               <span className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-status-ok" /> PJSIP &amp; chan_pjsip</span>
               <span className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-status-ok" /> TLS 1.3 / SRTP-SDES</span>
               <span className="flex items-center gap-2"><CheckCircle2 className="size-3.5 text-status-ok" /> Let's Encrypt automation</span>
@@ -96,21 +94,20 @@ function Index() {
             </div>
           </div>
 
-          {/* VoIP-themed visual: live call panel */}
           <CallPanelMock />
         </div>
       </section>
 
-      {/* METRICS STRIP */}
-      <section className="border-b border-border bg-surface-2/60">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-px overflow-hidden md:grid-cols-4">
+      {/* METRICS STRIP — flat, single color. */}
+      <section className="border-b border-border bg-surface">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-y divide-border md:grid-cols-4 md:divide-y-0">
           {[
             ["TLS-encrypted", "100%", "of generated transports"],
             ["Config drift", "0 ms", "deterministic renderer"],
             ["Audit retention", "∞", "append-only ledger"],
             ["Inbound ports", "0", "agent dials out over HTTPS"],
           ].map(([k, v, sub]) => (
-            <div key={k} className="bg-background px-6 py-8">
+            <div key={k} className="px-6 py-8">
               <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">{k}</div>
               <div className="mt-2 font-display text-3xl font-bold text-foreground md:text-4xl">{v}</div>
               <div className="mt-1 text-xs text-muted-foreground">{sub}</div>
@@ -119,40 +116,71 @@ function Index() {
         </div>
       </section>
 
-      {/* CAPABILITIES */}
-      <section id="capabilities" className="mx-auto max-w-7xl px-6 py-24">
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">Capabilities</span>
-          <h2 className="mt-3 font-display text-4xl font-bold tracking-tight">
-            Everything a VoIP operator needs in one console
-          </h2>
-          <p className="mt-4 text-muted-foreground">
-            Built around how SIP actually fails in production — expired certificates,
-            silent reload failures, brute-force registrations, missing audit trails.
-          </p>
-        </div>
-        <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-3">
-          {capabilities.map((c) => (
-            <div
-              key={c.title}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-surface p-6 transition-all hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-xl hover:shadow-brand/5"
-            >
-              <div className="mb-5 inline-flex size-10 items-center justify-center rounded-lg bg-brand-soft text-brand">
-                <c.icon className="size-5" strokeWidth={1.75} />
-              </div>
-              <h3 className="font-display text-lg font-semibold">{c.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.desc}</p>
+      {/* CALL FLOW DIAGRAM */}
+      <section id="flow" className="border-b border-border py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-12 max-w-2xl">
+            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">Call path</span>
+            <h2 className="mt-3 font-display text-4xl font-bold tracking-tight text-foreground">
+              Every leg encrypted. Every hop logged.
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Inbound and outbound SIP traffic terminates on TLS, RTP media is
+              wrapped in SRTP, and each call leg lands in an append-only CDR
+              ledger streamed back to the control plane.
+            </p>
+          </div>
+          <CallFlowDiagram />
+
+          {/* Channel status tiles */}
+          <div className="mt-12">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-display text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Live channel status · pbx-fra-01
+              </h3>
+              <span className="font-mono text-xs text-muted-foreground">42 / 120 channels</span>
             </div>
-          ))}
+            <ChannelTiles />
+          </div>
+        </div>
+      </section>
+
+      {/* CAPABILITIES */}
+      <section id="capabilities" className="border-b border-border bg-surface py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">Capabilities</span>
+            <h2 className="mt-3 font-display text-4xl font-bold tracking-tight text-foreground">
+              Everything a VoIP operator needs in one console
+            </h2>
+            <p className="mt-4 text-muted-foreground">
+              Built around how SIP actually fails in production — expired certificates,
+              silent reload failures, brute-force registrations, missing audit trails.
+            </p>
+          </div>
+          <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-3">
+            {capabilities.map((c) => (
+              <div
+                key={c.title}
+                className="group rounded-2xl border border-border bg-background p-6 transition-colors hover:border-brand/50"
+              >
+                <div className="mb-5 inline-flex size-10 items-center justify-center rounded-lg border border-border bg-surface text-brand transition-colors group-hover:border-brand/40">
+                  <c.icon className="size-5" strokeWidth={1.75} />
+                </div>
+                <h3 className="font-display text-lg font-semibold text-foreground">{c.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* HOW IT WORKS — pipeline */}
-      <section id="how" className="border-t border-border bg-surface-2/40 py-24">
+      <section id="how" className="border-b border-border py-24">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-14 max-w-2xl">
             <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">How it works</span>
-            <h2 className="mt-3 font-display text-4xl font-bold tracking-tight">
+            <h2 className="mt-3 font-display text-4xl font-bold tracking-tight text-foreground">
               From form input to a reloaded PBX in seconds
             </h2>
           </div>
@@ -160,7 +188,7 @@ function Index() {
             {pipeline.map((step, i) => (
               <li key={step.t} className="relative rounded-2xl border border-border bg-surface p-6">
                 <div className="mb-3 font-mono text-xs text-brand">STEP 0{i + 1}</div>
-                <h3 className="font-display text-base font-semibold">{step.t}</h3>
+                <h3 className="font-display text-base font-semibold text-foreground">{step.t}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{step.d}</p>
                 {i < 3 && (
                   <ArrowRight className="absolute right-3 top-1/2 hidden size-4 -translate-y-1/2 text-border md:block" />
@@ -172,11 +200,11 @@ function Index() {
       </section>
 
       {/* INSTALL */}
-      <section id="install" className="border-t border-border py-24">
+      <section id="install" className="border-b border-border bg-surface py-24">
         <div className="mx-auto grid max-w-7xl gap-12 px-6 md:grid-cols-2 md:items-center">
           <div>
             <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">Get started</span>
-            <h2 className="mt-3 font-display text-4xl font-bold tracking-tight">
+            <h2 className="mt-3 font-display text-4xl font-bold tracking-tight text-foreground">
               One command. One outbound connection.
             </h2>
             <p className="mt-4 text-muted-foreground">
@@ -199,8 +227,8 @@ function Index() {
             </ul>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-xl shadow-foreground/5">
-            <div className="flex items-center justify-between border-b border-border bg-surface-2 px-4 py-2 text-xs">
+          <div className="overflow-hidden rounded-2xl border border-border bg-background">
+            <div className="flex items-center justify-between border-b border-border bg-surface px-4 py-2 text-xs">
               <div className="flex items-center gap-1.5">
                 <span className="size-2.5 rounded-full bg-status-err/70" />
                 <span className="size-2.5 rounded-full bg-status-warn/70" />
@@ -209,13 +237,13 @@ function Index() {
               <span className="font-mono text-muted-foreground">root@pbx-fra-01 ~ install.sh</span>
               <span />
             </div>
-            <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-relaxed">
+            <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-relaxed text-foreground">
 <span className="text-muted-foreground"># 1. register the server in the dashboard,</span>{"\n"}
 <span className="text-muted-foreground">#    copy the one-time enrollment token</span>{"\n\n"}
-<span className="text-foreground">curl</span> -sSf https://asterops.dev/install.sh \{"\n"}
-{"  | "}<span className="text-foreground">sudo bash</span> -s -- \{"\n"}
-{"      "}<span className="text-brand">--token</span> ao_xxxxxxxxxxxxxxxxxxxxxxxxx \{"\n"}
-{"      "}<span className="text-brand">--url</span>   https://your-asterops.app{"\n\n"}
+curl -sSf https://asterops.dev/install.sh \{"\n"}
+{"  | sudo bash -s -- \\"}{"\n"}
+{"      --token ao_xxxxxxxxxxxxxxxxxxxxxxxxx \\"}{"\n"}
+{"      --url   https://your-asterops.app"}{"\n\n"}
 <span className="text-status-ok">✓ agent enrolled · pulled pjsip.conf v3 · reload OK</span>{"\n"}
 <span className="text-status-ok">✓ streaming CDR · 4 active channels</span>
             </pre>
@@ -223,66 +251,10 @@ function Index() {
         </div>
       </section>
 
-      {/* AUDIT PREVIEW */}
-      <section id="audit" className="border-t border-border bg-surface-2/40 py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">Live call audit</span>
-              <h2 className="mt-3 font-display text-4xl font-bold tracking-tight">
-                Every call. Every server. Append-only.
-              </h2>
-            </div>
-            <p className="max-w-sm text-sm text-muted-foreground">
-              Database-level RLS blocks <span className="font-mono">UPDATE</span> and{" "}
-              <span className="font-mono">DELETE</span> on call records — even for admins.
-            </p>
-          </div>
-
-          <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-lg shadow-foreground/5">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-border bg-surface-2 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-                <tr>
-                  <th className="px-6 py-3 font-medium">Timestamp</th>
-                  <th className="px-6 py-3 font-medium">Source</th>
-                  <th className="px-6 py-3 font-medium">Destination</th>
-                  <th className="px-6 py-3 font-medium">Duration</th>
-                  <th className="px-6 py-3 font-medium">Encryption</th>
-                  <th className="px-6 py-3 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border font-mono text-xs">
-                {[
-                  ["14:02:11", "+1 555 0102", "2001 (Sales)", "04:12", "TLS · SRTP", "ANSWERED", "ok"],
-                  ["13:58:45", "+1 415 2201", "Trunk-Main", "00:45", "—", "NO ANSWER", "muted"],
-                  ["13:55:02", "Unknown ID", "Admin-EXT", "—", "—", "REJECTED", "err"],
-                  ["13:42:19", "+44 20 7946", "9000 (Support)", "12:01", "TLS · SRTP", "ANSWERED", "ok"],
-                  ["13:31:08", "2034 (Eng)", "+33 1 8688", "07:33", "TLS · SRTP", "ANSWERED", "ok"],
-                ].map((r, i) => (
-                  <tr key={i} className="hover:bg-surface-2/60">
-                    <td className="px-6 py-3 text-muted-foreground">{r[0]}</td>
-                    <td className="px-6 py-3 text-foreground">{r[1]}</td>
-                    <td className="px-6 py-3 text-foreground">{r[2]}</td>
-                    <td className="px-6 py-3">{r[3]}</td>
-                    <td className={`px-6 py-3 ${r[4] !== "—" ? "text-status-ok" : "text-muted-foreground"}`}>{r[4]}</td>
-                    <td className={`px-6 py-3 ${r[6] === "ok" ? "text-status-ok" : r[6] === "err" ? "text-status-err" : "text-muted-foreground"}`}>
-                      <span className="flex items-center gap-2">
-                        <span className={`size-1.5 rounded-full ${r[6] === "ok" ? "bg-status-ok" : r[6] === "err" ? "bg-status-err" : "bg-muted-foreground"}`} />
-                        {r[5]}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
       {/* CTA */}
-      <section className="border-t border-border py-20">
-        <div className="mx-auto max-w-3xl rounded-2xl border border-border bg-surface px-8 py-12 text-center shadow-xl shadow-brand/5 md:px-12">
-          <h2 className="font-display text-3xl font-bold tracking-tight md:text-4xl">
+      <section className="border-b border-border py-20">
+        <div className="mx-auto max-w-3xl rounded-2xl border border-border bg-surface px-8 py-12 text-center md:px-12">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
             Bring order to your PBX fleet.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
@@ -298,7 +270,7 @@ function Index() {
         </div>
       </section>
 
-      <footer className="border-t border-border py-10">
+      <footer className="py-10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 md:flex-row">
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
             <Brand size="sm" />
@@ -331,69 +303,239 @@ const pipeline = [
   { t: "Stream CDR", d: "Call records flow back into the append-only audit ledger." },
 ];
 
-function CallPanelMock() {
-  const calls = [
-    { from: "+1 555 0102", to: "2001", state: "TALKING", dur: "02:17", enc: true },
-    { from: "+44 20 7946", to: "9000", state: "TALKING", dur: "11:43", enc: true },
-    { from: "Unknown",     to: "Admin", state: "REJECTED", dur: "00:01", enc: false },
-    { from: "2034",        to: "+33 1 8688", state: "RINGING", dur: "—",  enc: true },
+/* ───────────── VoIP call flow diagram ───────────── */
+
+function CallFlowDiagram() {
+  // Four nodes: SIP carrier → Asterisk PBX → SIP phone, with AsterOps control plane above.
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border bg-surface p-6 md:p-10">
+      <svg
+        viewBox="0 0 920 320"
+        className="w-full text-foreground"
+        role="img"
+        aria-label="VoIP call flow: SIP carrier to Asterisk PBX to SIP endpoint, with AsterOps control plane"
+      >
+        {/* Control plane node (top center) */}
+        <FlowNode x={400} y={28} w={140} h={56} label="AsterOps control plane" sub="HTTPS · outbound" />
+
+        {/* Dashed control links from control plane down to PBX */}
+        <line x1="470" y1="84" x2="470" y2="170" className="stroke-border animate-dash" strokeWidth="1.5" />
+
+        {/* SIP carrier (left) */}
+        <FlowNode x={30} y={150} w={170} h={92} label="SIP carrier" sub="TLS 1.3 · SDES SRTP" iconKind="cloud" />
+
+        {/* PBX (middle) */}
+        <FlowNode x={400} y={150} w={140} h={92} label="Asterisk PBX" sub="chan_pjsip" iconKind="server" highlight />
+
+        {/* Endpoint (right) */}
+        <FlowNode x={720} y={150} w={170} h={92} label="SIP endpoint" sub="2001 · Sales" iconKind="phone" />
+
+        {/* Signaling/media paths */}
+        <FlowPath d="M200,180 C 290,180 320,180 400,180" labelTop="SIP/TLS · port 5061" labelBot="SRTP · audio" />
+        <FlowPath d="M540,180 C 620,180 650,180 720,180" labelTop="SIP/TLS · port 5061" labelBot="SRTP · audio" />
+
+        {/* CDR ledger label */}
+        <g transform="translate(360, 268)">
+          <rect width="200" height="32" rx="8" className="fill-background stroke-border" strokeWidth="1" />
+          <text x="100" y="20" textAnchor="middle" className="fill-current text-[11px] font-mono" style={{ fontFamily: "JetBrains Mono, monospace" }}>
+            CDR → append-only ledger
+          </text>
+        </g>
+        <line x1="470" y1="242" x2="470" y2="268" className="stroke-border" strokeWidth="1" />
+      </svg>
+    </div>
+  );
+}
+
+function FlowNode({
+  x, y, w, h, label, sub, iconKind, highlight = false,
+}: {
+  x: number; y: number; w: number; h: number;
+  label: string; sub?: string;
+  iconKind?: "cloud" | "server" | "phone";
+  highlight?: boolean;
+}) {
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <rect
+        width={w}
+        height={h}
+        rx="12"
+        className={`fill-background ${highlight ? "stroke-brand" : "stroke-border"}`}
+        strokeWidth={highlight ? 1.5 : 1}
+      />
+      <foreignObject x="12" y="10" width={w - 24} height={h - 20}>
+        <div className="flex h-full items-center gap-3">
+          {iconKind === "cloud" && <Cloud className="size-5 shrink-0 text-brand" />}
+          {iconKind === "server" && <Server className="size-5 shrink-0 text-brand" />}
+          {iconKind === "phone" && <Headphones className="size-5 shrink-0 text-brand" />}
+          {!iconKind && <Cable className="size-5 shrink-0 text-brand" />}
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold leading-tight text-foreground">{label}</div>
+            {sub && <div className="truncate font-mono text-[10px] uppercase tracking-wider text-muted-foreground">{sub}</div>}
+          </div>
+        </div>
+      </foreignObject>
+    </g>
+  );
+}
+
+function FlowPath({ d, labelTop, labelBot }: { d: string; labelTop?: string; labelBot?: string }) {
+  return (
+    <g>
+      <path d={d} className="fill-none stroke-brand" strokeWidth="1.5" />
+      <circle r="4" className="fill-brand">
+        <animateMotion dur="2.6s" repeatCount="indefinite" path={d} />
+      </circle>
+      <circle r="3" className="fill-brand/60">
+        <animateMotion dur="2.6s" begin="1.3s" repeatCount="indefinite" path={d} />
+      </circle>
+      {labelTop && (
+        <text className="fill-muted-foreground" style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10 }}>
+          <textPath href={`#__hidden_${labelTop}`} startOffset="50%" />
+        </text>
+      )}
+      {/* Plain text labels above and below midpoint */}
+      {labelTop && (
+        <PathLabel d={d} text={labelTop} offset={-12} />
+      )}
+      {labelBot && (
+        <PathLabel d={d} text={labelBot} offset={20} />
+      )}
+    </g>
+  );
+}
+
+function PathLabel({ d, text, offset }: { d: string; text: string; offset: number }) {
+  // Place a label at the geometric midpoint of a path's bounding box.
+  // For our cubic paths in CallFlowDiagram, the midpoint y is ~180.
+  // Cheap approach: parse first M to anchor x to center between M start and end.
+  const m = /M([\d.]+),([\d.]+).*?(\d{2,3}),(\d{2,3})\s*$/.exec(d);
+  if (!m) return null;
+  const x1 = parseFloat(m[1]);
+  const x2 = parseFloat(m[3]);
+  const y = parseFloat(m[2]);
+  return (
+    <text
+      x={(x1 + x2) / 2}
+      y={y + offset}
+      textAnchor="middle"
+      className="fill-muted-foreground"
+      style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10 }}
+    >
+      {text}
+    </text>
+  );
+}
+
+/* ───────────── Channel status tiles ───────────── */
+
+function ChannelTiles() {
+  // Deterministic mock — first N busy, next M ringing, rest idle.
+  const total = 48;
+  const tiles = Array.from({ length: total }, (_, i) => {
+    if (i < 18) return "talking";
+    if (i < 22) return "ringing";
+    if (i === 23) return "error";
+    return "idle";
+  });
+  const legend = [
+    { k: "talking", label: "Talking", cls: "bg-status-ok" },
+    { k: "ringing", label: "Ringing", cls: "bg-status-warn animate-tile" },
+    { k: "error",   label: "Failed",  cls: "bg-status-err" },
+    { k: "idle",    label: "Idle",    cls: "bg-muted" },
   ];
   return (
-    <div className="relative">
-      <div className="absolute -inset-4 -z-10 rounded-3xl bg-radial-brand blur-2xl opacity-60" aria-hidden />
-      <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl shadow-foreground/10">
-        <div className="flex items-center justify-between border-b border-border bg-surface-2 px-5 py-3">
-          <div className="flex items-center gap-2">
-            <span className="relative inline-flex size-2.5 items-center justify-center">
-              <span className="absolute inline-flex size-full rounded-full bg-status-ok/40 animate-pulse-ring" />
-              <span className="relative inline-flex size-2 rounded-full bg-status-ok" />
-            </span>
-            <span className="font-mono text-xs text-muted-foreground">pbx-fra-01 · Asterisk 20.7</span>
-          </div>
-          <span className="font-mono text-[11px] text-brand">4 active</span>
+    <div className="rounded-2xl border border-border bg-surface p-5">
+      <div className="grid grid-cols-12 gap-1.5 sm:grid-cols-16 md:grid-cols-24">
+        {tiles.map((t, i) => {
+          const cls =
+            t === "talking" ? "bg-status-ok"
+              : t === "ringing" ? "bg-status-warn animate-tile"
+              : t === "error"   ? "bg-status-err"
+              : "bg-muted";
+          return (
+            <div
+              key={i}
+              title={`ch-${(i + 1).toString().padStart(3, "0")} · ${t}`}
+              className={`h-6 rounded-sm border border-border/60 ${cls}`}
+            />
+          );
+        })}
+      </div>
+      <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
+        {legend.map((l) => (
+          <span key={l.k} className="inline-flex items-center gap-2">
+            <span className={`size-2.5 rounded-sm ${l.cls}`} /> {l.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ───────────── Hero side panel: live calls ───────────── */
+
+function CallPanelMock() {
+  const calls = [
+    { from: "+1 555 0102", to: "2001",        state: "TALKING",  dur: "02:17", enc: true },
+    { from: "+44 20 7946", to: "9000",        state: "TALKING",  dur: "11:43", enc: true },
+    { from: "Unknown",     to: "Admin",       state: "REJECTED", dur: "00:01", enc: false },
+    { from: "2034",        to: "+33 1 8688",  state: "RINGING",  dur: "—",     enc: true },
+  ];
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border bg-surface">
+      <div className="flex items-center justify-between border-b border-border bg-background px-5 py-3">
+        <div className="flex items-center gap-2">
+          <span className="relative inline-flex size-2.5 items-center justify-center">
+            <span className="absolute inline-flex size-full rounded-full bg-status-ok/40 animate-pulse-ring" />
+            <span className="relative inline-flex size-2 rounded-full bg-status-ok" />
+          </span>
+          <span className="font-mono text-xs text-muted-foreground">pbx-fra-01 · Asterisk 20.7</span>
         </div>
-        <div className="divide-y divide-border">
-          {calls.map((c) => (
-            <div key={c.from + c.to} className="flex items-center gap-4 px-5 py-3.5 text-sm">
-              <PhoneCall className="size-4 text-brand shrink-0" />
-              <div className="min-w-0 flex-1">
-                <div className="truncate font-mono text-xs">
-                  <span className="text-foreground">{c.from}</span>
-                  <span className="mx-2 text-muted-foreground">→</span>
-                  <span className="text-foreground">{c.to}</span>
-                </div>
-                <div className="mt-0.5 flex items-center gap-2 text-[11px]">
-                  <span className={c.enc ? "text-status-ok" : "text-muted-foreground"}>
-                    {c.enc ? "TLS · SRTP" : "—"}
-                  </span>
-                  <span className="text-muted-foreground">·</span>
-                  <span className="font-mono text-muted-foreground">{c.dur}</span>
-                </div>
+        <span className="font-mono text-[11px] text-brand">4 active</span>
+      </div>
+      <div className="divide-y divide-border">
+        {calls.map((c) => (
+          <div key={c.from + c.to} className="flex items-center gap-4 px-5 py-3.5 text-sm">
+            <PhoneCall className="size-4 shrink-0 text-brand" />
+            <div className="min-w-0 flex-1">
+              <div className="truncate font-mono text-xs text-foreground">
+                {c.from}
+                <span className="mx-2 text-muted-foreground">→</span>
+                {c.to}
               </div>
-              {c.state === "TALKING" ? (
-                <Waveform />
-              ) : (
-                <span className={`font-mono text-[10px] uppercase tracking-wider ${
-                  c.state === "REJECTED" ? "text-status-err" : "text-status-warn"
-                }`}>
-                  {c.state}
+              <div className="mt-0.5 flex items-center gap-2 text-[11px] text-muted-foreground">
+                <span className={c.enc ? "text-status-ok" : ""}>
+                  {c.enc ? "TLS · SRTP" : "no encryption"}
                 </span>
-              )}
+                <span>·</span>
+                <span className="font-mono">{c.dur}</span>
+              </div>
             </div>
-          ))}
-        </div>
-        <div className="grid grid-cols-3 border-t border-border bg-surface-2 text-center">
-          {[
-            ["Calls 24h", "1,284"],
-            ["Encrypted", "100%"],
-            ["Cert OK", "84d"],
-          ].map(([k, v]) => (
-            <div key={k} className="px-3 py-3">
-              <div className="font-mono text-sm font-semibold text-foreground">{v}</div>
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{k}</div>
-            </div>
-          ))}
-        </div>
+            {c.state === "TALKING" ? (
+              <Waveform />
+            ) : (
+              <span className={`font-mono text-[10px] uppercase tracking-wider ${
+                c.state === "REJECTED" ? "text-status-err" : "text-status-warn"
+              }`}>
+                {c.state}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-3 divide-x divide-border border-t border-border bg-background text-center">
+        {[
+          ["Calls 24h", "1,284"],
+          ["Encrypted", "100%"],
+          ["Cert OK", "84d"],
+        ].map(([k, v]) => (
+          <div key={k} className="px-3 py-3">
+            <div className="font-mono text-sm font-semibold text-foreground">{v}</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{k}</div>
+          </div>
+        ))}
       </div>
     </div>
   );
