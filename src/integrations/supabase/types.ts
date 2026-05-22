@@ -268,6 +268,42 @@ export type Database = {
           },
         ]
       }
+      notification_deliveries: {
+        Row: {
+          attempted_at: string
+          channel: string
+          error: string | null
+          id: string
+          notification_id: string
+          server_id: string | null
+          status: string
+          status_code: number | null
+          target: string | null
+        }
+        Insert: {
+          attempted_at?: string
+          channel: string
+          error?: string | null
+          id?: string
+          notification_id: string
+          server_id?: string | null
+          status: string
+          status_code?: number | null
+          target?: string | null
+        }
+        Update: {
+          attempted_at?: string
+          channel?: string
+          error?: string | null
+          id?: string
+          notification_id?: string
+          server_id?: string | null
+          status?: string
+          status_code?: number | null
+          target?: string | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           acknowledged_at: string | null
