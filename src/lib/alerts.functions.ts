@@ -140,3 +140,37 @@ export const sendTestAlert = createServerFn({ method: "POST" })
     });
     return { ok: true, error: null };
   });
+
+/**
+ * List webhook/email delivery attempts joined with their originating
+ * notification (kind, severity, title, originating server). One row per
+ * attempt — attempted/success/failed/skipped — so operators can see exactly
+ * which cert/TLS/SRTP/reload alert failed to deliver and why.
+ */
+export const listAlertDeliveries = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) =>
+    z
+      .object({
+        server_id: z.string().uuid().optional().nullable(),
+        channel: z.enum(["webhook", "email"]).optional().nullable(),
+        status: z.enum(["attempted", "success", "failed", "skipped"]).optional().nullable(),
+        limit: z.number().int().min(1).max(500).default(200),
+      })
+      .parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    let q = context.supabase
+      .from("notification_deliveries")
+      .select(
+        "id, notification_id, server_id, channel, target, status, status_code, error, attempted_at, servers(name), notifications(kind, severity, title, message)",
+      )
+      .order("attempted_at", { ascending: false })
+      .limit(data.limit);
+    if (data.server_id) q = q.eq("server_id", data.server_id);
+    if (data.channel) q = q.eq("channel", data.channel);
+    if (data.status) q = q.eq("status", data.status);
+    const { data: rows, error } = await q;
+    if (error) return { deliveries: [], error: error.message };
+    return { deliveries: rows ?? [], error: null };
+  });
