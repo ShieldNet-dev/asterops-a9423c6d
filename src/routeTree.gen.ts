@@ -17,6 +17,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCallsRouteImport } from './routes/_authenticated/calls'
 import { Route as AuthenticatedAuditRouteImport } from './routes/_authenticated/audit'
 import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
+import { Route as AuthenticatedAlertLogRouteImport } from './routes/_authenticated/alert-log'
 import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
 import { Route as AuthenticatedServersIndexRouteImport } from './routes/_authenticated/servers.index'
 import { Route as AuthenticatedServersIdRouteImport } from './routes/_authenticated/servers.$id'
@@ -63,6 +64,11 @@ const AuthenticatedAuditRoute = AuthenticatedAuditRouteImport.update({
 const AuthenticatedAlertsRoute = AuthenticatedAlertsRouteImport.update({
   id: '/alerts',
   path: '/alerts',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAlertLogRoute = AuthenticatedAlertLogRouteImport.update({
+  id: '/alert-log',
+  path: '/alert-log',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAgentsRoute = AuthenticatedAgentsRouteImport.update({
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/agents': typeof AuthenticatedAgentsRoute
+  '/alert-log': typeof AuthenticatedAlertLogRoute
   '/alerts': typeof AuthenticatedAlertsRoute
   '/audit': typeof AuthenticatedAuditRoute
   '/calls': typeof AuthenticatedCallsRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/agents': typeof AuthenticatedAgentsRoute
+  '/alert-log': typeof AuthenticatedAlertLogRoute
   '/alerts': typeof AuthenticatedAlertsRoute
   '/audit': typeof AuthenticatedAuditRoute
   '/calls': typeof AuthenticatedCallsRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/_authenticated/agents': typeof AuthenticatedAgentsRoute
+  '/_authenticated/alert-log': typeof AuthenticatedAlertLogRoute
   '/_authenticated/alerts': typeof AuthenticatedAlertsRoute
   '/_authenticated/audit': typeof AuthenticatedAuditRoute
   '/_authenticated/calls': typeof AuthenticatedCallsRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/agents'
+    | '/alert-log'
     | '/alerts'
     | '/audit'
     | '/calls'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/agents'
+    | '/alert-log'
     | '/alerts'
     | '/audit'
     | '/calls'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/_authenticated/agents'
+    | '/_authenticated/alert-log'
     | '/_authenticated/alerts'
     | '/_authenticated/audit'
     | '/_authenticated/calls'
@@ -285,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAlertsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/alert-log': {
+      id: '/_authenticated/alert-log'
+      path: '/alert-log'
+      fullPath: '/alert-log'
+      preLoaderRoute: typeof AuthenticatedAlertLogRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/agents': {
       id: '/_authenticated/agents'
       path: '/agents'
@@ -346,6 +365,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRoute
+  AuthenticatedAlertLogRoute: typeof AuthenticatedAlertLogRoute
   AuthenticatedAlertsRoute: typeof AuthenticatedAlertsRoute
   AuthenticatedAuditRoute: typeof AuthenticatedAuditRoute
   AuthenticatedCallsRoute: typeof AuthenticatedCallsRoute
@@ -356,6 +376,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAgentsRoute: AuthenticatedAgentsRoute,
+  AuthenticatedAlertLogRoute: AuthenticatedAlertLogRoute,
   AuthenticatedAlertsRoute: AuthenticatedAlertsRoute,
   AuthenticatedAuditRoute: AuthenticatedAuditRoute,
   AuthenticatedCallsRoute: AuthenticatedCallsRoute,
@@ -382,3 +403,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
