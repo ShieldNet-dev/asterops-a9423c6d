@@ -195,6 +195,7 @@ function AuditPage() {
                 <th className="px-6 py-3 font-medium">Action</th>
                 <th className="px-6 py-3 font-medium">Server</th>
                 <th className="px-6 py-3 font-medium">Actor</th>
+                <th className="px-6 py-3 font-medium">Role</th>
                 <th className="px-6 py-3 font-medium">Target</th>
               </tr>
             </thead>
@@ -211,6 +212,7 @@ function AuditPage() {
                     ) : "—"}
                   </td>
                   <td className="px-6 py-3 text-muted-foreground">{e.actor_id ? e.actor_id.slice(0, 8) : "system"}</td>
+                  <td className="px-6 py-3 text-muted-foreground">{e.actor_role ?? "—"}</td>
                   <td className="px-6 py-3 text-muted-foreground">
                     {e.target_type ? `${e.target_type}${e.target_id ? `:${e.target_id.slice(0, 8)}` : ""}` : "—"}
                   </td>
