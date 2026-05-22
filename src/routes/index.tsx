@@ -391,12 +391,6 @@ function FlowPath({ d, labelTop, labelBot }: { d: string; labelTop?: string; lab
         <animateMotion dur="2.6s" begin="1.3s" repeatCount="indefinite" path={d} />
       </circle>
       {labelTop && (
-        <text className="fill-muted-foreground" style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10 }}>
-          <textPath href={`#__hidden_${labelTop}`} startOffset="50%" />
-        </text>
-      )}
-      {/* Plain text labels above and below midpoint */}
-      {labelTop && (
         <PathLabel d={d} text={labelTop} offset={-12} />
       )}
       {labelBot && (
@@ -447,7 +441,7 @@ function ChannelTiles() {
   ];
   return (
     <div className="rounded-2xl border border-border bg-surface p-5">
-      <div className="grid grid-cols-12 gap-1.5 sm:grid-cols-16 md:grid-cols-24">
+      <div className="grid grid-cols-12 gap-1.5 sm:grid-cols-[repeat(16,minmax(0,1fr))] md:grid-cols-[repeat(24,minmax(0,1fr))]">
         {tiles.map((t, i) => {
           const cls =
             t === "talking" ? "bg-status-ok"
