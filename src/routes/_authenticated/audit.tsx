@@ -58,19 +58,42 @@ function AuditPage() {
 
   // CSV reflects EXACTLY the rows currently shown (after every active filter).
   const csvBlob = useMemo(() => {
-    const header = ["created_at", "action", "actor_id", "server_id", "server_name", "target_type", "target_id", "meta"];
+    const header = [
+      "created_at", "action", "actor_id", "actor_role",
+      "server_id", "server_name", "target_type", "target_id", "meta",
+    ];
     const escape = (v: unknown) => {
       const s = v == null ? "" : typeof v === "string" ? v : JSON.stringify(v);
       const safe = s.replace(/"/g, '""');
       return /[",\n\r]/.test(safe) ? `"${safe}"` : safe;
     };
+    const serverName = serverId === "all"
+      ? "all"
+      : (serversQ.data?.servers ?? []).find((s) => s.id === serverId)?.name ?? serverId;
+    // Preamble documents the exact filter scope used for this export.
+    const preamble = [
+      `# AsterOps audit export`,
+      `# exported_at=${new Date().toISOString()}`,
+      `# scope.server=${serverName}`,
+      `# scope.user_role=${role}`,
+      `# scope.action=${action || "*"}`,
+      `# scope.actor_id=${actorId || "*"}`,
+      `# scope.since=${since ? new Date(since).toISOString() : "*"}`,
+      `# scope.until=${until ? new Date(until).toISOString() : "*"}`,
+      `# row_count=${events.length}`,
+    ];
     const rows = events.map((e: any) =>
-      [e.created_at, e.action, e.actor_id ?? "", e.server_id ?? "", e.servers?.name ?? "", e.target_type ?? "", e.target_id ?? "", e.meta ?? {}]
+      [
+        e.created_at, e.action,
+        e.actor_id ?? "", e.actor_role ?? "",
+        e.server_id ?? "", e.servers?.name ?? "",
+        e.target_type ?? "", e.target_id ?? "", e.meta ?? {},
+      ]
         .map(escape)
         .join(","),
     );
-    return [header.join(","), ...rows].join("\r\n");
-  }, [events]);
+    return [...preamble, header.join(","), ...rows].join("\r\n");
+  }, [events, serverId, role, action, actorId, since, until, serversQ.data]);
 
   function exportCsv() {
     const blob = new Blob([csvBlob], { type: "text/csv;charset=utf-8" });
