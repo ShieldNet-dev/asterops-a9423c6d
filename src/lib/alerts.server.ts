@@ -36,7 +36,37 @@ export async function fireAlert(input: AlertInput): Promise<void> {
     .select("id")
     .single();
 
-  if (!server?.webhook_url || !note) return;
+  if (!note) return;
+
+  const logDelivery = async (row: {
+    channel: "webhook" | "email";
+    target: string | null;
+    status: "attempted" | "success" | "failed" | "skipped";
+    status_code?: number | null;
+    error?: string | null;
+  }) => {
+    await supabaseAdmin.from("notification_deliveries").insert({
+      notification_id: note.id,
+      server_id: input.serverId,
+      channel: row.channel,
+      target: row.target,
+      status: row.status,
+      status_code: row.status_code ?? null,
+      error: row.error ?? null,
+    } as never);
+  };
+
+  // Email channel — not wired to an SMTP provider in OSS build; record skip.
+  if (server?.alert_email) {
+    await logDelivery({
+      channel: "email",
+      target: server.alert_email,
+      status: "skipped",
+      error: "SMTP provider not configured in this deployment",
+    });
+  }
+
+  if (!server?.webhook_url) return;
 
   const payload = {
     id: note.id,
@@ -48,6 +78,8 @@ export async function fireAlert(input: AlertInput): Promise<void> {
     meta: input.meta ?? {},
     timestamp: new Date().toISOString(),
   };
+
+  await logDelivery({ channel: "webhook", target: server.webhook_url, status: "attempted" });
 
   try {
     const res = await fetch(server.webhook_url, {
@@ -66,8 +98,28 @@ export async function fireAlert(input: AlertInput): Promise<void> {
         .from("notifications")
         .update({ delivered_webhook: true } as never)
         .eq("id", note.id);
+      await logDelivery({
+        channel: "webhook",
+        target: server.webhook_url,
+        status: "success",
+        status_code: res.status,
+      });
+    } else {
+      await logDelivery({
+        channel: "webhook",
+        target: server.webhook_url,
+        status: "failed",
+        status_code: res.status,
+        error: `HTTP ${res.status} ${res.statusText}`,
+      });
     }
   } catch (err) {
     console.error("[alerts] webhook delivery failed", err);
+    await logDelivery({
+      channel: "webhook",
+      target: server.webhook_url,
+      status: "failed",
+      error: err instanceof Error ? err.message : String(err),
+    });
   }
 }
