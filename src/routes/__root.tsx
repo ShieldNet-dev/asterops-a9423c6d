@@ -81,7 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Open-source control plane for Asterisk fleets. Automate PJSIP provisioning, enforce TLS/SRTP, and stream immutable call audit logs.",
       },
       { name: "author", content: "AsterOps" },
-      { property: "og:title", content: "AsterOps — Secure VoIP Provisioning" },
+      { property: "og:title", content: "AsterOps — Secure VoIP Provisioning & PBX Orchestration" },
       {
         property: "og:description",
         content:
@@ -89,6 +89,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "AsterOps — Secure VoIP Provisioning & PBX Orchestration" },
+      { name: "description", content: "Automates Asterisk PBX configuration and security hardening for VoIP servers." },
+      { property: "og:description", content: "Automates Asterisk PBX configuration and security hardening for VoIP servers." },
+      { name: "twitter:description", content: "Automates Asterisk PBX configuration and security hardening for VoIP servers." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/VHlMUMTHmETIB8MrbXVvnucm0Hk2/social-images/social-1779794461097-file_00000000ab10720a8c20ed56c65e338a.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/VHlMUMTHmETIB8MrbXVvnucm0Hk2/social-images/social-1779794461097-file_00000000ab10720a8c20ed56c65e338a.webp" },
     ],
     links: [
       {
