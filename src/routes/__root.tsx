@@ -93,8 +93,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Automates Asterisk PBX configuration and security hardening for VoIP servers." },
       { property: "og:description", content: "Automates Asterisk PBX configuration and security hardening for VoIP servers." },
       { name: "twitter:description", content: "Automates Asterisk PBX configuration and security hardening for VoIP servers." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5478f3aa-89e4-4d6f-9841-c3523fa07abf/id-preview-c55d6de6--6435acea-dd20-466f-8707-b11a929aad02.lovable.app-1779794545294.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/5478f3aa-89e4-4d6f-9841-c3523fa07abf/id-preview-c55d6de6--6435acea-dd20-466f-8707-b11a929aad02.lovable.app-1779794545294.png" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/VHlMUMTHmETIB8MrbXVvnucm0Hk2/social-images/social-1779794969781-file_00000000ab10720a8c20ed56c65e338a.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/VHlMUMTHmETIB8MrbXVvnucm0Hk2/social-images/social-1779794969781-file_00000000ab10720a8c20ed56c65e338a.webp" },
     ],
     links: [
       {
