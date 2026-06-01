@@ -332,7 +332,195 @@ function CallFlowDiagram() {
   );
 }
 
-// Keep FlowNode, FlowPath, PathLabel, ChannelTiles, CallPanelMock, Waveform as-is (or with minor polish if desired)
+function FlowNode({
+  x, y, w, h, label, sub, iconKind, highlight,
+}: {
+  x: number; y: number; w: number; h: number;
+  label: string; sub?: string;
+  iconKind?: "cloud" | "server" | "phone";
+  highlight?: boolean;
+}) {
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      <rect
+        width={w}
+        height={h}
+        rx={12}
+        className={
+          highlight
+            ? "fill-brand/10 stroke-brand"
+            : "fill-background stroke-border"
+        }
+        strokeWidth={1.5}
+      />
+      <text
+        x={w / 2}
+        y={h / 2 - (sub ? 6 : -4)}
+        textAnchor="middle"
+        className={`fill-current text-[13px] font-semibold ${highlight ? "text-brand" : ""}`}
+      >
+        {label}
+      </text>
+      {sub && (
+        <text
+          x={w / 2}
+          y={h / 2 + 14}
+          textAnchor="middle"
+          className="fill-current text-[10px] font-mono opacity-60"
+        >
+          {sub}
+        </text>
+      )}
+      {iconKind && (
+        <circle cx={16} cy={16} r={4} className="fill-brand" />
+      )}
+    </g>
+  );
+}
+
+function FlowPath({
+  d, labelTop, labelBot,
+}: { d: string; labelTop?: string; labelBot?: string }) {
+  return (
+    <g>
+      <path d={d} className="stroke-brand" strokeWidth={2} fill="none" />
+      {labelTop && (
+        <text className="fill-current text-[10px] font-mono opacity-70">
+          <textPath href="#none" startOffset="50%" textAnchor="middle">
+            {labelTop}
+          </textPath>
+        </text>
+      )}
+      {/* Simple absolute labels above/below the midpoint of the path */}
+      {labelTop && (
+        <text
+          x={(parseFloat(d.split(",")[0].replace(/[^\d.-]/g, "")) +
+            parseFloat(d.split(" ").pop()!.split(",")[0])) / 2}
+          y={188}
+          textAnchor="middle"
+          className="fill-current text-[10px] font-mono opacity-70"
+        >
+          {labelTop}
+        </text>
+      )}
+      {labelBot && (
+        <text
+          x={(parseFloat(d.split(",")[0].replace(/[^\d.-]/g, "")) +
+            parseFloat(d.split(" ").pop()!.split(",")[0])) / 2}
+          y={218}
+          textAnchor="middle"
+          className="fill-current text-[10px] font-mono opacity-50"
+        >
+          {labelBot}
+        </text>
+      )}
+    </g>
+  );
+}
+
+function ChannelTiles() {
+  const channels = [
+    { ext: "2001", state: "In call", dur: "02:14", ok: true },
+    { ext: "2002", state: "Ringing", dur: "00:03", ok: true },
+    { ext: "2003", state: "Idle", dur: "—", ok: true },
+    { ext: "2004", state: "In call", dur: "11:48", ok: true },
+    { ext: "2005", state: "Registered", dur: "—", ok: true },
+    { ext: "2006", state: "In call", dur: "00:47", ok: true },
+    { ext: "2007", state: "Idle", dur: "—", ok: true },
+    { ext: "2008", state: "In call", dur: "05:21", ok: true },
+  ];
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {channels.map((c) => (
+        <div
+          key={c.ext}
+          className="rounded-xl border border-border bg-background p-4"
+        >
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-sm font-semibold">{c.ext}</span>
+            <span className="size-2 rounded-full bg-status-ok" />
+          </div>
+          <div className="mt-2 text-xs text-muted-foreground">{c.state}</div>
+          <div className="mt-1 font-mono text-xs text-foreground/80">{c.dur}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CallPanelMock() {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+      <div className="flex items-center justify-between border-b border-border px-5 py-3">
+        <div className="flex items-center gap-2">
+          <span className="size-2 rounded-full bg-status-ok animate-pulse" />
+          <span className="text-xs font-medium text-muted-foreground">
+            pbx-fra-01 • live
+          </span>
+        </div>
+        <span className="font-mono text-[10px] text-muted-foreground">
+          v47 • TLS 1.3
+        </span>
+      </div>
+      <div className="p-5 space-y-4">
+        <div className="flex items-baseline justify-between">
+          <div>
+            <div className="text-xs uppercase tracking-wider text-muted-foreground">
+              Active channels
+            </div>
+            <div className="font-display text-4xl font-semibold">12</div>
+          </div>
+          <div className="text-right">
+            <div className="text-xs uppercase tracking-wider text-muted-foreground">
+              Encrypted
+            </div>
+            <div className="font-display text-4xl font-semibold text-brand">
+              100%
+            </div>
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-background p-3">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-mono">2001 → +1-415-555-0142</span>
+            <span className="font-mono text-status-ok">SRTP</span>
+          </div>
+          <div className="mt-2 h-8 flex items-end gap-0.5">
+            {Array.from({ length: 48 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex-1 rounded-sm bg-brand/70"
+                style={{
+                  height: `${20 + Math.abs(Math.sin(i * 0.6)) * 80}%`,
+                  opacity: 0.4 + Math.abs(Math.sin(i * 0.9)) * 0.6,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <div className="rounded-lg border border-border bg-background p-3">
+            <div className="font-mono text-lg font-semibold">38ms</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Latency
+            </div>
+          </div>
+          <div className="rounded-lg border border-border bg-background p-3">
+            <div className="font-mono text-lg font-semibold">4.3</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              MOS
+            </div>
+          </div>
+          <div className="rounded-lg border border-border bg-background p-3">
+            <div className="font-mono text-lg font-semibold">0.0%</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+              Loss
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const capabilities = [
   { 
