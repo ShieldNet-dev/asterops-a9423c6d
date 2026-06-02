@@ -3,11 +3,6 @@
   "buildCommand": "vite build",
   "outputDirectory": "dist/client",
   "framework": null,
-  "functions": {
-    "api/index.mjs": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/api/index" }
   ]
