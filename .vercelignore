@@ -1,0 +1,4 @@
+supabase/
+agent/
+.lovable/
+wrangler.jsonc
