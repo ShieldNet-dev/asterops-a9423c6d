@@ -167,3 +167,5 @@ function AlertLogPage() {
     </div>
   );
 }
+
+export default AlertLogPage;

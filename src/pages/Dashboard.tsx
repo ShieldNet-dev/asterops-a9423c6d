@@ -179,3 +179,5 @@ function fmtDuration(sec: number): string {
   const s = sec % 60;
   return `${m}:${String(s).padStart(2, "0")}`;
 }
+
+export default DashboardPage;

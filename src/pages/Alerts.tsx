@@ -159,3 +159,5 @@ function SeverityIcon({ severity }: { severity: string }) {
     return <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-status-warn/10 text-status-warn"><AlertTriangle className="size-4" /></span>;
   return <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground"><Info className="size-4" /></span>;
 }
+
+export default AlertsPage;

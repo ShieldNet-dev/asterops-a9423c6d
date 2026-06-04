@@ -567,3 +567,5 @@ function TerminalInstall() {
     </div>
   );
 }
+
+export default Index;

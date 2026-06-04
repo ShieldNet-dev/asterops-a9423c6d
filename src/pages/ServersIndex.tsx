@@ -180,3 +180,5 @@ function EnrollmentReveal({ token, serverId, onClose }: { token: string; serverI
     </>
   );
 }
+
+export default ServersPage;

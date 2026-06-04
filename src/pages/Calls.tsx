@@ -61,3 +61,5 @@ function CallsPage() {
     </div>
   );
 }
+
+export default CallsPage;

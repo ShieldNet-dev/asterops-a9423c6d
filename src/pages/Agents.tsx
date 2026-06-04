@@ -172,3 +172,5 @@ function fmtAge(sec: number): string {
   if (sec < 86400) return `${Math.floor(sec / 3600)}h ago`;
   return `${Math.floor(sec / 86400)}d ago`;
 }
+
+export default AgentsPage;

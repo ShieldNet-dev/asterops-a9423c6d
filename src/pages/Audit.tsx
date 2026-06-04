@@ -220,3 +220,5 @@ function AuditPage() {
     </div>
   );
 }
+
+export default AuditPage;
