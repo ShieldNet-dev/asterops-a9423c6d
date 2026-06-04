@@ -17,7 +17,7 @@ class ServerFnBuilder<I = unknown> {
   middleware(_: unknown[]) {
     return this;
   }
-  inputValidator<NewI>(v: (i: unknown) => NewI) {
+  inputValidator<NewI>(v: (i: any) => NewI) {
     this._validator = v as unknown as (i: unknown) => I;
     return this as unknown as ServerFnBuilder<NewI>;
   }
