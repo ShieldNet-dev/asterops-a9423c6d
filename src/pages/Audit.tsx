@@ -201,7 +201,7 @@ function AuditPage() {
                   <td className="px-6 py-3 text-foreground">{e.action}</td>
                   <td className="px-6 py-3 text-muted-foreground">
                     {e.server_id ? (
-                      <Link to="/servers/$id" params={{ id: e.server_id }} className="hover:text-brand">
+                      <Link to={`/servers/${e.server_id}`} className="hover:text-brand">
                         {e.servers?.name ?? e.server_id.slice(0, 8)}
                       </Link>
                     ) : "—"}

@@ -5,7 +5,7 @@ import { listCalls } from "@/lib/calls.functions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Download, ShieldCheck } from "lucide-react";
-import { CallsTable } from "./servers.$id";
+import { CallsTable } from "./ServerDetail";
 
 function CallsPage() {
   const [src, setSrc] = useState("");

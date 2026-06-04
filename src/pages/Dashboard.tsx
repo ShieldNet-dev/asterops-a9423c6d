@@ -62,7 +62,7 @@ function DashboardPage() {
             <ul className="divide-y divide-border">
               {certAlerts.slice(0, 5).map((c: any) => (
                 <li key={c.id} className="flex items-center justify-between px-5 py-3 text-sm">
-                  <Link to="/servers/$id" params={{ id: c.id }} className="hover:text-brand">{c.name}</Link>
+                  <Link to={`/servers/${c.id}`} className="hover:text-brand">{c.name}</Link>
                   <span className={`font-mono text-xs ${c.severity === "warn" ? "text-status-warn" : "text-status-err"}`}>
                     {c.severity === "expired" ? "EXPIRED" : `${c.days_remaining}d remaining`}
                   </span>
@@ -130,7 +130,7 @@ function DashboardPage() {
               {servers.slice(0, 6).map((s) => (
                 <tr key={s.id} className="hover:bg-surface-2/40">
                   <td className="px-6 py-3"><StatusPill status={s.status} /></td>
-                  <td className="px-6 py-3"><Link to="/servers/$id" params={{ id: s.id }} className="text-foreground hover:text-brand">{s.name}</Link></td>
+                  <td className="px-6 py-3"><Link to={`/servers/${s.id}`} className="text-foreground hover:text-brand">{s.name}</Link></td>
                   <td className="px-6 py-3 font-mono text-xs text-muted-foreground">{s.hostname ?? "—"}</td>
                   <td className="px-6 py-3 font-mono text-xs text-muted-foreground">{s.asterisk_version ?? "—"}</td>
                   <td className="px-6 py-3 text-right text-xs text-muted-foreground">{s.last_seen_at ? new Date(s.last_seen_at).toLocaleString() : "—"}</td>

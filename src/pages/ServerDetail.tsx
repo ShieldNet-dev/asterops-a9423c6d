@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { ChevronLeft, Copy, Plus, Trash2, RefreshCw, Download, Send, Upload, ShieldCheck, AlertTriangle, RotateCcw, Bell, Webhook } from "lucide-react";
-import { StatusPill } from "./dashboard";
+import { StatusPill } from "./Dashboard";
 import {
   listCerts,
   uploadCert,
@@ -42,7 +42,7 @@ import { listPjsipVersions, rollbackPjsipConfig } from "@/lib/rollback.functions
 import { updateAlertingConfig, sendTestAlert } from "@/lib/alerts.functions";
 
 function ServerDetail() {
-  const { id } = useParams({ from: "/_authenticated/servers/$id" });
+  const { id } = useParams() as Record<string, string>;
   const navigate = useNavigate();
   const qc = useQueryClient();
   const fetchServer = useServerFn(getServer);

@@ -78,7 +78,7 @@ function AlertsPage() {
               {expiring.map((i: any) => (
                 <tr key={i.id}>
                   <td className="px-6 py-3">
-                    <Link to="/servers/$id" params={{ id: i.id }} className="font-medium hover:text-brand">{i.name}</Link>
+                    <Link to={`/servers/${i.id}`} className="font-medium hover:text-brand">{i.name}</Link>
                   </td>
                   <td className={`px-6 py-3 font-mono ${
                     i.severity === "expired" || i.severity === "critical" ? "text-status-err" : "text-status-warn"
@@ -88,7 +88,7 @@ function AlertsPage() {
                   <td className="px-6 py-3 text-xs text-muted-foreground">{i.cert_expires_at ? new Date(i.cert_expires_at).toLocaleDateString() : "—"}</td>
                   <td className="px-6 py-3 font-mono text-xs text-muted-foreground">warn {i.warn_days}d · crit {i.critical_days}d</td>
                   <td className="px-6 py-3 text-right">
-                    <Link to="/servers/$id" params={{ id: i.id }}>
+                    <Link to={`/servers/${i.id}`}>
                       <Button size="sm" variant="outline">Open</Button>
                     </Link>
                   </td>
@@ -125,7 +125,7 @@ function AlertsPage() {
                     <span className="font-medium text-foreground">{n.title}</span>
                     <Badge variant="outline" className="font-mono text-[10px]">{n.kind}</Badge>
                     {n.servers?.name && (
-                      <Link to="/servers/$id" params={{ id: n.server_id }} className="font-mono text-xs text-muted-foreground hover:text-brand">
+                      <Link to={`/servers/${n.server_id}`} className="font-mono text-xs text-muted-foreground hover:text-brand">
                         {n.servers.name}
                       </Link>
                     )}

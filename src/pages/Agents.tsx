@@ -59,7 +59,7 @@ function AgentsPage() {
               {servers.map((s: any) => (
                 <tr key={s.id} className="hover:bg-surface-2/40">
                   <td className="px-6 py-3">
-                    <Link to="/servers/$id" params={{ id: s.id }} className="flex items-center gap-2 hover:text-brand">
+                    <Link to={`/servers/${s.id}`} className="flex items-center gap-2 hover:text-brand">
                       <Server className="size-3.5 text-muted-foreground" />
                       <span>{s.name}</span>
                     </Link>
@@ -112,7 +112,7 @@ function AgentsPage() {
                     <td className="px-6 py-3 text-muted-foreground">{new Date(r.created_at).toLocaleString()}</td>
                     <td className="px-6 py-3">
                       {srv ? (
-                        <Link to="/servers/$id" params={{ id: srv.id }} className="hover:text-brand">{srv.name}</Link>
+                        <Link to={`/servers/${srv.id}`} className="hover:text-brand">{srv.name}</Link>
                       ) : r.server_id.slice(0, 8)}
                     </td>
                     <td className="px-6 py-3">v{r.config_version ?? "—"}</td>

@@ -137,7 +137,7 @@ function AlertLogPage() {
                     </td>
                     <td className="px-6 py-3 text-muted-foreground">
                       {d.server_id ? (
-                        <Link to="/servers/$id" params={{ id: d.server_id }} className="hover:text-brand">
+                        <Link to={`/servers/${d.server_id}`} className="hover:text-brand">
                           {d.servers?.name ?? d.server_id.slice(0, 8)}
                         </Link>
                       ) : "—"}

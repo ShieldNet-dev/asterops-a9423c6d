@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Plus, Copy } from "lucide-react";
-import { StatusPill } from "./dashboard";
+import { StatusPill } from "./Dashboard";
 
 function ServersPage() {
   const fetch = useServerFn(listServers);
@@ -85,7 +85,7 @@ function ServersPage() {
                 <tr key={s.id} className="hover:bg-surface-2/40">
                   <td className="px-6 py-3"><StatusPill status={s.status} /></td>
                   <td className="px-6 py-3">
-                    <Link to="/servers/$id" params={{ id: s.id }} className="text-foreground hover:text-brand">{s.name}</Link>
+                    <Link to={`/servers/${s.id}`} className="text-foreground hover:text-brand">{s.name}</Link>
                   </td>
                   <td className="px-6 py-3 font-mono text-xs text-muted-foreground">{s.hostname ?? "—"}</td>
                   <td className="px-6 py-3 text-xs text-muted-foreground">{s.region ?? "—"}</td>
@@ -173,7 +173,7 @@ function EnrollmentReveal({ token, serverId, onClose }: { token: string; serverI
         </Button>
       </div>
       <DialogFooter>
-        <Link to="/servers/$id" params={{ id: serverId }}>
+        <Link to={`/servers/${serverId}`}>
           <Button onClick={onClose}>Open server</Button>
         </Link>
       </DialogFooter>
