@@ -1,1 +1,18 @@
 project_id = "tqpeidaigcjuulxaruml"
+
+# Agent endpoints use a shared-secret bearer token (see _shared/agent-auth.ts).
+# They must be reachable by Go agents that do NOT carry a Supabase user JWT.
+[functions.agent-enroll]
+verify_jwt = false
+
+[functions.agent-status]
+verify_jwt = false
+
+[functions.agent-cdr]
+verify_jwt = false
+
+[functions.agent-configs]
+verify_jwt = false
+
+[functions.agent-tls]
+verify_jwt = false

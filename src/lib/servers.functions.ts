@@ -1,5 +1,5 @@
-import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { createServerFn } from "./_shim";
+import { requireSupabaseAuth } from "./_shim";
 import { z } from "zod";
 
 function randomToken(bytes = 24): string {
