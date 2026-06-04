@@ -7,11 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Download, ShieldCheck } from "lucide-react";
 import { CallsTable } from "./servers.$id";
 
-({
-  head: () => ({ meta: [{ title: "Call audit log — AsterOps" }] }),
-  component: CallsPage,
-});
-
 function CallsPage() {
   const [src, setSrc] = useState("");
   const [dst, setDst] = useState("");

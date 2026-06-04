@@ -8,11 +8,6 @@ import { ArrowRight, Server, ShieldCheck, PhoneCall, Lock, ShieldAlert, Bell } f
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-({
-  head: () => ({ meta: [{ title: "Dashboard — AsterOps" }] }),
-  component: DashboardPage,
-});
-
 function DashboardPage() {
   const fetchServers = useServerFn(listServers);
   const fetchStats = useServerFn(callStats);

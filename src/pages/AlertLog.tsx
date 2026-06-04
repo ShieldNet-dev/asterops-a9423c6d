@@ -10,11 +10,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, XCircle, CircleDashed, MinusCircle, Send } from "lucide-react";
 
-({
-  head: () => ({ meta: [{ title: "Alert delivery log — AsterOps" }] }),
-  component: AlertLogPage,
-});
-
 const STATUS_META: Record<string, { label: string; tone: string; Icon: any }> = {
   attempted: { label: "Attempted", tone: "text-muted-foreground", Icon: CircleDashed },
   success:   { label: "Success",   tone: "text-status-ok",       Icon: CheckCircle2 },

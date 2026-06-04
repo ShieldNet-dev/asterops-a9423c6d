@@ -8,11 +8,6 @@ import { Badge } from "@/components/ui/badge";
 import { Bell, Check, ShieldAlert, AlertTriangle, Info } from "lucide-react";
 import { toast } from "sonner";
 
-({
-  head: () => ({ meta: [{ title: "Alerts — AsterOps" }] }),
-  component: AlertsPage,
-});
-
 function AlertsPage() {
   const qc = useQueryClient();
   const fetchNotes = useServerFn(listNotifications);

@@ -8,11 +8,6 @@ import { Brand } from "@/components/brand";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
-({
-  head: () => ({ meta: [{ title: "Sign in — AsterOps" }] }),
-  component: LoginPage,
-});
-
 function LoginPage() {
   const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();

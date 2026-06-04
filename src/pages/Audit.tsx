@@ -17,11 +17,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Download, ShieldCheck, Lock } from "lucide-react";
 
-({
-  head: () => ({ meta: [{ title: "Audit log — AsterOps" }] }),
-  component: AuditPage,
-});
-
 function AuditPage() {
   const fetchEvents = useServerFn(listAuditEvents);
   const fetchServers = useServerFn(listServers);

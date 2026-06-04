@@ -5,11 +5,6 @@ import { fleetHealth } from "@/lib/agent-health.functions";
 import { Badge } from "@/components/ui/badge";
 import { Activity, Server, PhoneCall, Clock, CheckCircle2, XCircle, RotateCcw } from "lucide-react";
 
-({
-  head: () => ({ meta: [{ title: "Agent health — AsterOps" }] }),
-  component: AgentsPage,
-});
-
 function AgentsPage() {
   const fetchHealth = useServerFn(fleetHealth);
   const q = useQuery({

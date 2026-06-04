@@ -41,11 +41,6 @@ import {
 import { listPjsipVersions, rollbackPjsipConfig } from "@/lib/rollback.functions";
 import { updateAlertingConfig, sendTestAlert } from "@/lib/alerts.functions";
 
-({
-  head: () => ({ meta: [{ title: "Server — AsterOps" }] }),
-  component: ServerDetail,
-});
-
 function ServerDetail() {
   const { id } = useParams({ from: "/_authenticated/servers/$id" });
   const navigate = useNavigate();

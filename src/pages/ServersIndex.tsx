@@ -19,11 +19,6 @@ import { toast } from "sonner";
 import { Plus, Copy } from "lucide-react";
 import { StatusPill } from "./dashboard";
 
-({
-  head: () => ({ meta: [{ title: "Servers — AsterOps" }] }),
-  component: ServersPage,
-});
-
 function ServersPage() {
   const fetch = useServerFn(listServers);
   const create = useServerFn(createServer);

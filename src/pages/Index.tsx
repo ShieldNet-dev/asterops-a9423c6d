@@ -19,20 +19,6 @@ import {
   Cable,
 } from "lucide-react";
 
-({
-  head: () => ({
-    meta: [
-      { title: "AsterOps — Hardened Control Plane for Asterisk" },
-      {
-        name: "description",
-        content:
-          "Open-source control plane for Asterisk PBX fleets. Secure provisioning, enforced encryption, and immutable audit logs — built for operators who run production VoIP.",
-      },
-    ],
-  }),
-  component: Index,
-});
-
 function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
