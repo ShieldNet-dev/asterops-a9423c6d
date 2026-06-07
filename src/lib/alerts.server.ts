@@ -2,7 +2,7 @@
 // service-role client + outbound HTTPS. From the browser we cannot reach
 // arbitrary webhooks (CORS) nor send email. We instead record an attempt
 // row so the operator sees the request in the alert log.
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 
 export async function fireAlert(input: {
   serverId: string;
