@@ -1,6 +1,6 @@
 // Thin compatibility shim that lets former TanStack createServerFn wrappers
 // run client-side against Supabase with the user's RLS-scoped session.
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 
 export async function _ctx() {
   const { data, error } = await supabase.auth.getUser();
