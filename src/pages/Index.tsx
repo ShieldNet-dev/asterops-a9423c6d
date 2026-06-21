@@ -822,4 +822,88 @@ function DemoCTA() {
   );
 }
 
+/* ─────────────── Setup / How to install ─────────────── */
+
+function SetupSection() {
+  const [step, setStep] = useState(0);
+  const steps = [
+    {
+      title: "1. Install the agent",
+      desc: "One-line install on any Debian/Ubuntu/RHEL host running Asterisk.",
+      code: "pip install asterops-agent",
+    },
+    {
+      title: "2. Apply the baseline",
+      desc: "TLS-only, SRTP-required, fail2ban, firewall, AMI lockdown — all idempotent.",
+      code: "sudo asterops run --profile baseline --dry-run\nsudo asterops run --profile baseline",
+    },
+    {
+      title: "3. Auto-configure your PBX",
+      desc: "Render pjsip.conf / extensions.conf / rtp.conf from a single YAML.",
+      code: "sudo asterops provision inventory.yaml\nsudo asterisk -rx 'pjsip reload'",
+    },
+    {
+      title: "4. Upload posture reports",
+      desc: "Push HTML + JSON security reports into your AsterOps dashboard.",
+      code: "export ASTEROPS_URL=https://your-control-plane/functions/v1\nexport ASTEROPS_AGENT_TOKEN=...\nasterops report --profile baseline",
+    },
+  ];
+  return (
+    <section id="setup" className="relative border-y border-border bg-surface py-24 md:py-32">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="mb-12 max-w-2xl">
+          <div className="text-xs font-semibold uppercase tracking-widest text-brand">Setup</div>
+          <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight md:text-5xl">
+            From zero to hardened PBX in four commands.
+          </h2>
+          <p className="mt-4 text-lg text-muted-foreground">
+            Open source. Python. Apache-2.0. Runs on the box you already have.
+          </p>
+        </div>
+        <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
+          <aside className="space-y-1">
+            {steps.map((s, i) => (
+              <button
+                key={i}
+                onClick={() => setStep(i)}
+                className={`block w-full rounded-lg border px-4 py-3 text-left text-sm transition-colors ${
+                  i === step
+                    ? "border-brand bg-brand-soft text-foreground"
+                    : "border-border bg-background hover:bg-surface-2"
+                }`}
+              >
+                <div className="font-medium">{s.title}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{s.desc}</div>
+              </button>
+            ))}
+          </aside>
+          <div className="overflow-hidden rounded-xl border border-border bg-background">
+            <div className="flex items-center justify-between border-b border-border bg-surface-2 px-4 py-2">
+              <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
+                <span className="size-2.5 rounded-full bg-status-err/70" />
+                <span className="size-2.5 rounded-full bg-status-warn/70" />
+                <span className="size-2.5 rounded-full bg-status-ok/70" />
+                <span className="ml-3">root@pbx-01 ~ #</span>
+              </div>
+              <button
+                className="text-xs text-muted-foreground hover:text-foreground"
+                onClick={() => navigator.clipboard.writeText(steps[step].code)}
+              >
+                Copy
+              </button>
+            </div>
+            <pre className="px-6 py-6 text-sm font-mono leading-relaxed text-foreground whitespace-pre-wrap break-words">{steps[step].code}</pre>
+            <div className="border-t border-border bg-surface-2 px-6 py-4 text-xs text-muted-foreground">
+              Full docs &amp; profiles on GitHub →{" "}
+              <a className="text-brand hover:underline" href="https://github.com/asterops/asterops" target="_blank" rel="noreferrer">
+                github.com/asterops/asterops
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default Index;
