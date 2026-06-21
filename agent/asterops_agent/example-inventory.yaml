@@ -1,0 +1,27 @@
+# Example AsterOps inventory — feed to `asterops provision`.
+server_name: hq-pbx-01
+tls_only: true
+cert_file: /etc/asterisk/keys/asterisk.crt
+priv_key_file: /etc/asterisk/keys/asterisk.key
+rtp_start: 10000
+rtp_end: 20000
+
+endpoints:
+  - extension: "1001"
+    display_name: "Reception"
+    context: from-internal
+    codecs: [opus, ulaw, alaw]
+    tls_required: true
+    srtp_required: true
+    max_contacts: 2
+  - extension: "1002"
+    display_name: "Support"
+    context: from-internal
+
+trunks:
+  - name: telnyx-primary
+    host: sip.telnyx.com
+    port: 5061
+    username: my-trunk-user
+    transport: transport-tls
+    srtp_required: true
