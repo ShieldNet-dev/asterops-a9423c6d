@@ -84,10 +84,11 @@ function SiteFooter() {
           <span>Open control plane for Asterisk fleets</span>
         </div>
         <div className="flex flex-wrap justify-center gap-8">
-          <a href="#" className="transition-colors hover:text-foreground">GitHub</a>
+          <a href="https://github.com/asterops/asterops" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"><Github className="size-3.5" /> GitHub</a>
           <a href="#security" className="transition-colors hover:text-foreground">Security</a>
-          <a href="#" className="transition-colors hover:text-foreground">MIT License</a>
-          <a href="#" className="transition-colors hover:text-foreground">Docs</a>
+          <a href="https://github.com/asterops/asterops/blob/main/LICENSE" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground">Apache-2.0</a>
+          <a href="https://github.com/asterops/asterops#quick-start" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground">Docs</a>
+          <a href="#setup" className="transition-colors hover:text-foreground">Setup</a>
           <a href="#demo" className="transition-colors hover:text-foreground">Contact</a>
         </div>
       </div>
