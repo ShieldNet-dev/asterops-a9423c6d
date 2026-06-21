@@ -1,0 +1,10 @@
+name: msp-multitenant
+description: Stricter defaults for managed-service providers running multi-tenant Asterisk.
+platform: asterisk
+tls: { enabled: true, method: tlsv1_2, generate_self_signed_if_missing: true }
+srtp: { required: true, optimistic: false }
+firewall: { backend: nftables, rtp_start: 10000, rtp_end: 20000, block_sip_udp: true, block_sip_tcp: true }
+fail2ban: { enabled: true, maxretry: 2, findtime: 300, bantime: 604800 }
+ami: { lockdown: true }
+ssh: { permit_root_login: false, password_authentication: false }
+permissions: { enforce: true, conf_mode: "0600" }

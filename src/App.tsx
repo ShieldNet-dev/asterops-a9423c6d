@@ -15,6 +15,9 @@ import Calls from "@/pages/Calls";
 import ServersIndex from "@/pages/ServersIndex";
 import ServerDetail from "@/pages/ServerDetail";
 import NotFound from "@/pages/NotFound";
+import Security from "@/pages/Security";
+import Provisioning from "@/pages/Provisioning";
+import { AppShell } from "@/components/app-shell";
 
 const queryClient = new QueryClient();
 
@@ -40,14 +43,18 @@ export default function App() {
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
-            <Route path="/agents" element={<Protected><Agents /></Protected>} />
-            <Route path="/alerts" element={<Protected><Alerts /></Protected>} />
-            <Route path="/alert-log" element={<Protected><AlertLog /></Protected>} />
-            <Route path="/audit" element={<Protected><Audit /></Protected>} />
-            <Route path="/calls" element={<Protected><Calls /></Protected>} />
-            <Route path="/servers" element={<Protected><ServersIndex /></Protected>} />
-            <Route path="/servers/:id" element={<Protected><ServerDetail /></Protected>} />
+            <Route element={<Protected><AppShell /></Protected>}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/servers" element={<ServersIndex />} />
+              <Route path="/servers/:id" element={<ServerDetail />} />
+              <Route path="/security" element={<Security />} />
+              <Route path="/provisioning" element={<Provisioning />} />
+              <Route path="/calls" element={<Calls />} />
+              <Route path="/alerts" element={<Alerts />} />
+              <Route path="/alert-log" element={<AlertLog />} />
+              <Route path="/audit" element={<Audit />} />
+              <Route path="/agents" element={<Agents />} />
+            </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Toaster richColors position="bottom-right" />

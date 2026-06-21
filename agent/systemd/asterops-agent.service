@@ -1,24 +1,13 @@
 [Unit]
-Description=AsterOps agent (Asterisk control plane bridge)
-Documentation=https://asterops.dev
+Description=AsterOps posture scan & report
 After=network-online.target asterisk.service
 Wants=network-online.target
 
 [Service]
-Type=simple
-ExecStart=/usr/local/bin/asterops-agent --config /etc/asterops/agent/config.json
-Restart=always
-RestartSec=10s
+Type=oneshot
+EnvironmentFile=/etc/asterops/agent.env
+ExecStart=/usr/local/bin/asterops report --profile ${ASTEROPS_PROFILE}
 User=root
-# Hardening
-NoNewPrivileges=true
-ProtectSystem=full
-ReadWritePaths=/etc/asterisk /etc/asterops /var/lib/asterops /etc/letsencrypt
-PrivateTmp=true
-ProtectKernelTunables=true
-ProtectKernelModules=true
-ProtectControlGroups=true
-SystemCallArchitectures=native
 
 [Install]
 WantedBy=multi-user.target

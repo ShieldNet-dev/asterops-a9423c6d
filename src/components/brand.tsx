@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import logoAsset from "@/assets/asterops-logo.png.asset.json";
+import logoUrl from "@/assets/asterops-logo.png";
 
 /**
  * AsterOps brand. Uses the official logo lockup (orange compass mark + wordmark)
@@ -23,7 +23,7 @@ export function Brand({
   } as const;
   const img = (
     <img
-      src={logoAsset.url}
+      src={logoUrl}
       alt="AsterOps"
       className={cn(heights[size], "w-auto select-none")}
       draggable={false}

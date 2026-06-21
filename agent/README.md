@@ -1,71 +1,71 @@
-# AsterOps Agent
+# AsterOps Agent (Python)
 
-The AsterOps agent is a small daemon that runs on each Asterisk host and connects out
-to your AsterOps dashboard. It:
+The Python agent ships the security-hardening, auto-configuration and posture-reporting engine for AsterOps. Asterisk is the first supported platform, with a pluggable interface for FreeSWITCH, Kamailio and others.
 
-1. Enrolls itself using a one-time token from the dashboard.
-2. Polls for pending pjsip.conf updates and applies them via asterisk -rx 'pjsip reload'.
-3. Tails /var/log/asterisk/cdr-csv/Master.csv and streams CDR records to the dashboard.
-4. Reports heartbeat, agent version, Asterisk version, and TLS cert expiry.
+## Install
 
-All traffic is outbound HTTPS — no inbound ports are required, the agent works
-behind NAT or restrictive firewalls.
+```bash
+pip install asterops-agent
+# optional PDF reports
+pip install "asterops-agent[pdf]"
+```
 
-## HTTP API
+## Quick start
 
-All endpoints are at /api/public/agent/* and require Authorization: Bearer <agent_token>.
+```bash
+# list built-in profiles
+asterops profiles
 
-- POST /api/public/agent/enroll  — exchange the one-time enrollment token for a long-lived agent token (the enrollment token is invalidated immediately).
-- POST /api/public/agent/status  — heartbeat; reports agent_version, asterisk_version, active_calls, cert_expires_at.
-- GET  /api/public/agent/configs — returns the latest pending pjsip.conf bundle (or null).
-- POST /api/public/agent/configs — acknowledge a config after applying ({ config_id, state, notes? }).
-- POST /api/public/agent/cdr     — batch-stream up to 500 CDR records; idempotent by (server_id, uniqueid).
+# dry-run the baseline hardening
+sudo asterops run --profile baseline --dry-run
 
-## Reference implementation
+# apply baseline hardening and write a posture report
+sudo asterops run --profile baseline \
+    --report-json /tmp/posture.json \
+    --report-html /tmp/posture.html
 
-A production-grade Go agent ships in this directory:
+# only run the verification checks (no system changes)
+sudo asterops verify
 
-    agent/
-      main.go                          # single-file daemon (~500 LOC)
-      go.mod
-      systemd/asterops-agent.service   # hardened systemd unit
-      install.sh                       # one-shot installer + enrollment
+# generate Asterisk configs from a YAML inventory
+sudo asterops provision agent/asterops_agent/example-inventory.yaml --dry-run
 
-Quick install on the Asterisk host (root):
+# scan + upload posture report to the AsterOps dashboard
+asterops report \
+    --url https://<your-control-plane>/functions/v1 \
+    --token "$ASTEROPS_AGENT_TOKEN"
+```
 
-    curl -fsSL https://raw.githubusercontent.com/asterops/asterops/main/agent/install.sh \
-      | sudo bash -s -- \
-          --dashboard https://your-dashboard.example.com \
-          --token   ao_xxxxxxxxxxxxxxxxxxxxxx
+## What it does
 
-The installer builds the binary, writes `/etc/asterops/agent/config.json`,
-enrolls with the dashboard (consuming the one-time enrollment token), and
-enables the `asterops-agent` systemd service.
+- **TLS**: ensures `/etc/asterisk/keys/asterisk.{crt,key}` exist (self-signs if missing) and writes a `transport-tls` block bound to 5061.
+- **SRTP**: forces `media_encryption=sdes` on every rendered endpoint.
+- **Firewall**: writes idempotent iptables rules — drops UDP/TCP SIP, allows only TLS 5061 + your RTP range.
+- **fail2ban**: installs an Asterisk jail with sensible defaults.
+- **AMI lockdown**: binds `manager.conf` to loopback.
+- **SSH**: disables root login and password auth.
+- **Permissions**: enforces `0640` on `/etc/asterisk/*.conf`.
+- **Auto-config**: deterministic renderer for `pjsip.conf`, `extensions.conf`, `rtp.conf` from a YAML inventory.
+- **Verify**: TLS handshake probe, SRTP policy audit, firewall reachability, fail2ban jail status, AMI bind check.
+- **Reports**: machine-readable JSON, single-file HTML, optional PDF, uploadable to the AsterOps dashboard.
 
-### TLS lifecycle
+## Profiles
 
-The agent also implements `GET/POST /api/public/agent/tls` to support:
+| Profile | Use case |
+| --- | --- |
+| `baseline` | Sane opinionated defaults — TLS-only, SRTP required, fail2ban, AMI lockdown. |
+| `contact-center` | Larger RTP range and stricter fail2ban thresholds. |
+| `msp-multitenant` | Tighter bans and stricter file permissions for managed-service hosts. |
 
-- **Uploaded PEM** — operator pastes a cert in the dashboard; agent writes
-  it to `/etc/asterisk/keys/asterisk.crt` and reloads Asterisk.
-- **Let's Encrypt** — agent runs `certbot certonly --standalone` for the
-  requested domain, symlinks the live cert into `/etc/asterisk/keys/`, and
-  reports the resulting fingerprint + `not_after` back to the dashboard.
-  Renewals are requested from the dashboard ("Renew" button) and the agent
-  runs the same flow with `--keep-until-expiring`.
-- **Self-signed** — agent generates an ECDSA P-256 cert locally for the
-  given CN.
+Custom profile? Point `--profile` at any YAML file.
 
-All reloads use `asterisk -rx 'core reload'` after the new files are written
-atomically via `rename(2)`, so in-progress calls are not dropped.
+## Multi-platform roadmap
 
-Contributions welcome.
+The engine talks to VoIP stacks through `asterops_agent.platforms.VoipPlatform`. To add a new platform, drop a subdirectory under `platforms/` and register it in `PLATFORMS`. The CLI, profiles, verification and reporting layers stay untouched.
 
-## Security model
+## Development
 
-- The enrollment token is single-use and consumed on first enroll.
-- The long-lived agent token is stored only as a SHA-256 hash in the dashboard database.
-- TLS private keys for Asterisk never leave the host. The dashboard tracks only the
-  public certificate fingerprint and expiry.
-- Operators can rotate the enrollment token at any time, which invalidates the existing
-  agent token and forces re-enrollment.
+```bash
+pip install -e ".[dev]"
+pytest -q
+```

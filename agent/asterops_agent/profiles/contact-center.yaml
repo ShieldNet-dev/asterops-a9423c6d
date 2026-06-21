@@ -1,0 +1,10 @@
+name: contact-center
+description: Larger RTP range and higher per-extension contact limits for contact-centre seats.
+platform: asterisk
+tls: { enabled: true, generate_self_signed_if_missing: true }
+srtp: { required: true, optimistic: false }
+firewall: { backend: iptables, rtp_start: 10000, rtp_end: 30000, block_sip_udp: true, block_sip_tcp: true }
+fail2ban: { enabled: true, maxretry: 3, findtime: 300, bantime: 86400 }
+ami: { lockdown: true }
+ssh: { permit_root_login: false, password_authentication: false }
+permissions: { enforce: true }
