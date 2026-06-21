@@ -40,6 +40,7 @@ function Index() {
       <Testimonials />
       <DeploymentModels />
       <FAQSection />
+      <SetupSection />
       <DemoCTA />
       <SiteFooter />
     </div>
@@ -58,11 +59,12 @@ function SiteHeader() {
           <a href="#architecture" className="transition-colors hover:text-foreground">Architecture</a>
           <a href="#security" className="transition-colors hover:text-foreground">Security</a>
           <a href="#deployment" className="transition-colors hover:text-foreground">Deployment</a>
+          <a href="#setup" className="transition-colors hover:text-foreground">Setup</a>
           <a href="#faq" className="transition-colors hover:text-foreground">FAQ</a>
         </nav>
         <div className="flex items-center gap-1">
           <ThemeToggle />
-          <a href="https://github.com" className="hidden md:inline-flex" aria-label="GitHub">
+          <a href="https://github.com/asterops/asterops" target="_blank" rel="noreferrer" className="hidden md:inline-flex" aria-label="GitHub">
             <Button variant="ghost" size="sm"><Github className="size-4" /></Button>
           </a>
           <Link to="/login"><Button variant="ghost" size="sm">Sign in</Button></Link>
