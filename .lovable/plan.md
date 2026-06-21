@@ -1,104 +1,101 @@
-
-# Migrate AsterOps to plain Vite SPA + Supabase, deploy on Vercel
-
 ## Goal
 
-Strip TanStack Start entirely. End state:
+Keep AsterOps as the open-source product. Add a Python hardening module that satisfies the uni objectives (TLS/SRTP automation, reports, testing), so instead of using go, use python. Do not keep the Go agent replace with Python and keep dashboard, polish the UI to a serious enterprise look, and leave room to support non-Asterisk VoIP later.
 
-- `vite build` → `dist/` static SPA
-- `vercel.json` is a one-liner SPA rewrite (or removed; Vercel auto-detects Vite)
-- All backend logic lives in Supabase (RLS for reads/writes, Edge Functions for privileged + agent endpoints)
-- Go agents call Supabase Edge Function URLs, not the app's `/api/...`
+## Scope of this iteration
 
-## What gets removed
+I'll do this in **three focused passes**, each independently shippable, so we don't break the build:
 
-- `@tanstack/react-router`, `@tanstack/react-start`, `@tanstack/router-plugin`, `@vercel/node`
-- `src/router.tsx`, `src/server.ts`, `src/start.ts`, `src/routeTree.gen.ts`
-- All of `src/routes/` (replaced by `src/pages/` + `App.tsx` with `react-router-dom`)
-- All `*.functions.ts` and `*.server.ts` (logic moves to client+RLS or edge functions)
-- `api/index.mjs`, `.npmrc` workaround, `VERCEL.md` rewrite
-- `src/integrations/supabase/auth-middleware.ts`, `auth-attacher.ts`, `client.server.ts` (server-only files)
-- `wrangler.jsonc` (already gone)
+### Pass 1 — Python hardening module + auto-config (`hardening/`)
 
-## What gets added
-
-- `react-router-dom` v6
-- `src/App.tsx` with `<BrowserRouter>` + routes
-- `src/pages/` mirroring current routes (Index, Login, Signup, Dashboard, Agents, Alerts, AlertLog, Audit, Calls, Servers list/detail)
-- `src/components/ProtectedRoute.tsx` (replaces `_authenticated.tsx` layout gate)
-- `src/main.tsx` (Vite SPA entry)
-- `index.html` at project root (Vite SPA shell)
-- New Supabase Edge Functions (one per legacy server route + privileged server fn):
-  - `agent-enroll`, `agent-status`, `agent-cdr`, `agent-configs`, `agent-tls` (called by Go agents — shared-secret auth in headers)
-  - `tls-issue`, `rollback-execute`, `alerts-evaluate`, `pjsip-render` (called by SPA via `supabase.functions.invoke`)
-- For pure data reads/writes (alerts list, audit log, calls list, servers CRUD, agent-health read, rbac check), drop the wrapper entirely — call `supabase.from(...).select()` directly from React Query hooks. RLS already enforces who can read what.
-
-## Migration order (single PR, but staged in commits)
-
-1. **Install + scaffold**: add `react-router-dom`, create `index.html`, `src/main.tsx`, `src/App.tsx`, `vite.config.ts` rewrite (drop tanstackStart plugin, keep react + tailwind + path alias).
-2. **Page shells**: copy every route component body from `src/routes/**` into `src/pages/**`. Strip `createFileRoute`, `Route.useLoaderData`, `Route.useParams`, `Link` from `@tanstack/react-router`. Use `useParams`, `useNavigate`, `<Link>` from `react-router-dom`.
-3. **Data layer**: replace every `createServerFn` import + `useServerFn` call with either:
-   - `useQuery({ queryFn: () => supabase.from('x').select(...) })` for reads
-   - `useMutation` with `supabase.from('x').insert/update/delete` for writes
-   - `supabase.functions.invoke('fn-name', { body })` for privileged ops
-4. **Edge functions**: port `src/routes/api/public/agent/*.ts` and the privileged server fns (`tls`, `rollback`, `alerts.evaluate`, `pjsip.render`) into `supabase/functions/<name>/index.ts`. Reuse `pjsip-renderer.ts` and the validation schemas verbatim — they're framework-agnostic.
-5. **Auth**: replace `auth-middleware`/`auth-attacher` with `supabase.auth.getSession()` in React, and `Authorization: Bearer <jwt>` headers (auto-added by `supabase.functions.invoke`). Edge functions verify the JWT via `supabase.auth.getUser(token)`.
-6. **Cleanup**: delete TanStack files, uninstall TanStack packages, delete `api/index.mjs`, delete `.npmrc`, simplify `vercel.json` to `{ "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }`.
-7. **Update agent docs**: `agent/README.md` + `agent/install.sh` config — point `--dashboard` URL to the Supabase Functions base URL (e.g. `https://tqpeidaigcjuulxaruml.supabase.co/functions/v1`).
-
-## Technical details
-
-### Routes mapping (react-router-dom)
+New top-level `hardening/` Python package (separate from the Go agent — runs once per server, or on demand from the dashboard via the agent).
 
 ```text
-/                        → pages/Index.tsx           (public)
-/login                   → pages/Login.tsx           (public)
-/signup                  → pages/Signup.tsx          (public)
-/dashboard               → pages/Dashboard.tsx       (protected)
-/agents                  → pages/Agents.tsx          (protected)
-/alerts                  → pages/Alerts.tsx          (protected)
-/alert-log               → pages/AlertLog.tsx       (protected)
-/audit                   → pages/Audit.tsx           (protected)
-/calls                   → pages/Calls.tsx           (protected)
-/servers                 → pages/ServersIndex.tsx    (protected)
-/servers/:id             → pages/ServerDetail.tsx    (protected)
-*                        → pages/NotFound.tsx
+hardening/
+  asterops_harden/
+    __init__.py
+    cli.py                  # `asterops-harden run|report|verify|provision`
+    config.py               # YAML profile loader (sane defaults)
+    profiles/
+      baseline.yaml         # TLS-only, SRTP required, fail2ban, iptables, AMI lockdown
+      contact-center.yaml
+      msp-multitenant.yaml
+    modules/
+      tls.py                # generate CA + server cert, wire pjsip transport-tls
+      srtp.py               # force media_encryption=sdes on all endpoints
+      pjsip_autoconfig.py   # auto-generate extensions, trunks, AORs from YAML
+      firewall.py           # iptables / nftables rules (SIP/TLS 5061, RTP range)
+      fail2ban.py           # asterisk jail
+      ami.py                # bind 127.0.0.1, strong secret
+      ssh.py                # PermitRootLogin no, key-only
+      permissions.py        # /etc/asterisk ownership + modes
+    verify/
+      test_tls.py           # openssl s_client to 5061, cipher check
+      test_srtp.py          # SIP OPTIONS + SDP m= line inspection
+      test_firewall.py      # nmap-style port probe
+      test_fail2ban.py      # jail status parse
+    report/
+      collector.py          # gather all module + verify results
+      html.py               # Jinja2 -> single-file HTML report
+      pdf.py                # weasyprint -> PDF (optional dep)
+      json.py               # machine-readable, uploaded to dashboard
+  tests/
+    test_pjsip_render.py    # golden-file tests for auto-config
+    test_profiles.py
+    test_cli.py
+  pyproject.toml
+  README.md
 ```
 
-### Edge function auth pattern
+Key features:
 
-- **SPA-invoked** (`supabase.functions.invoke`): JWT auto-attached → inside fn, `createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { global: { headers: { Authorization: req.headers.get('Authorization')! } } })` for RLS-scoped queries, OR a service-role client for admin work after verifying `has_role(uid, 'admin')`.
-- **Agent-invoked** (Go agents): keep current shared-secret model from `agent-auth.server.ts` (HMAC signature header). Edge function verifies, then uses service-role client.
+- **Idempotent**: every module checks state before changing.
+- **Dry-run mode**: `--dry-run` prints diffs, changes nothing.
+- **Backup**: every changed file copied to `/var/backups/asterops/<ts>/`.
+- **Reports**: HTML + JSON, posted back to the dashboard via `agent-report` edge function so the UI can show a "Security Posture" page per server.
+- **Auto-config**: `pjsip_autoconfig.py` takes a YAML describing extensions/trunks/dial-plan and emits `pjsip.conf` + `extensions.conf` + `rtp.conf` — same deterministic renderer the Go agent already uses but now replaced using Python not go, ported to Python so it works standalone.
 
-### vite.config.ts (final)
+### Pass 2 — Dashboard polish (serious / enterprise look)
 
-```ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite';
-import path from 'node:path';
-export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
-});
-```
+Treat this as a real product surface. No layout rewrite of business pages — just visual + structural lift:
 
-### vercel.json (final)
+- New shared `**AppShell**` with a denser sidebar, top breadcrumb bar, command palette (Cmd-K), and global status pill (fleet health).
+- New **Security Posture** page (`/security`) — renders the uploaded hardening reports per server with score, failing checks, remediation hints, download HTML/PDF.
+- New **Provisioning** page (`/provisioning`) — UI for the Python auto-config: define extensions/trunks → generate pjsip preview → push to selected server(s).
+- Dashboard (`/dashboard`) restructured into sections: **Fleet health · Security posture · Call quality · Recent activity** with consistent card styling.
+- Refined design tokens in `src/styles.css`: tighter type scale, mono numerals for stats, single accent (electric blue on near-black), subtle gridlines, no gradient flourish. One distinctive display font + clean sans body — not Inter.
+- Marketing site (`src/pages/Index.tsx`) gets trust-building polish: real screenshots of the new dashboard, architecture diagram refresh, customer-evidence placeholders ready to fill.
 
-```json
-{ "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
-```
+### Pass 3 — Scalability seam for "other VoIP systems later"
 
-## Risks / things to confirm
+Small but important — done in code now so we're not painted in later:
 
-1. **Go agents will need redeploy** with the new Supabase Functions URL. Existing deployed agents pointing at `*.lovable.app` will stop working until reconfigured.
-2. **`pjsip.functions.ts` + `tls.functions.ts`** do real work (config rendering, cert generation). The Node `crypto` APIs they use work fine in Deno edge functions, but I'll need to verify any Node-specific imports.
-3. **`alerts.server.ts`** does evaluation that probably needs to run on a schedule. Today it's invoked from a server fn; on Supabase that'd be a `pg_cron` job hitting the edge function. I'll set that up.
-4. **Lovable preview will stop working** (already true after the previous migration). All testing happens via `vite dev` locally + Vercel preview deploys.
+- Introduce a `VoipPlatform` interface in `src/lib/platforms/` with one implementation: `asterisk.ts`. Server table gets a `platform` column (default `'asterisk'`).
+- Python: `hardening/asterops_harden/platforms/` with a base class and `asterisk/` implementation. Adding FreeSWITCH/Kamailio later = new subdir, no core changes.
+- Edge functions stay platform-agnostic; payloads carry `platform` field.
 
-## What I need from you
+DB migration adds `servers.platform text not null default 'asterisk'` only.
 
-Confirm and I'll execute the full migration in one go. After that, you'll need to:
+## Technical notes
 
-- Redeploy the Go agents with the new Supabase Functions URL
-- Trigger a fresh Vercel deploy (it'll just work — no `.npmrc`, no `api/`, no peer-deps hacks)
+- Python module is delivered as a `pip install asterops-harden` package, runnable as a CLI on any Asterisk host. The existing Go agent will be replaced by Python agent not go. 
+- Report upload uses a new `agent-report` edge function (JWT-authenticated like the others) + a `security_reports` table.
+- No removal of working features. No backend schema changes beyond `servers.platform` and `security_reports`.
+- I will not regenerate the marketing page from scratch — only refine sections and swap in new dashboard screenshots. and add the command to run. How a how to set up in the sidebar in the marketing page and the app logo icon is not showing in the various pages it looks broken pls rectify that. 
+- Pls make the GitHUb [readme.md](http://readme.md) file look very very professional that is an important part for any open source project pls make the GitHUb standout and add it to the fooster in the marketing page. 
+
+## What I will NOT do in this iteration
+
+- Build FreeSWITCH/Kamailio support (only leave the seam).
+- Add billing no billing because it is completely open source, multi-tenant org switcher, or SSO.
+- Touch the Go agent's wire protocol— Python module is independent.
+
+## Order of execution
+
+1. DB migration (`servers.platform`, `security_reports` table + RLS + grants).
+2. Python `hardening/` package with auto-config + TLS/SRTP + verify + HTML/JSON report + tests.
+3. `agent-report` edge function.
+4. Dashboard: design tokens, AppShell, Security Posture page, Provisioning page, dashboard restructure.
+5. Marketing page polish with new screenshots.
+
+Confirm and I'll start with step 1 (the migration).
