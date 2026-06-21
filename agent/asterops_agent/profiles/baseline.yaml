@@ -1,0 +1,48 @@
+name: baseline
+description: >
+  Sane, opinionated AsterOps baseline. Forces TLS-only signalling on 5061,
+  SRTP-required media, locks AMI to loopback, installs a fail2ban jail,
+  drops UDP/TCP SIP at the firewall, and hardens SSH. Idempotent.
+platform: asterisk
+
+tls:
+  enabled: true
+  bind: 0.0.0.0:5061
+  method: tlsv1_2
+  generate_self_signed_if_missing: true
+  cert_file: /etc/asterisk/keys/asterisk.crt
+  priv_key_file: /etc/asterisk/keys/asterisk.key
+  cn: asterisk.local
+
+srtp:
+  required: true
+  optimistic: false
+
+firewall:
+  backend: iptables
+  allow_ssh: true
+  allow_sip_tls: true
+  block_sip_udp: true
+  block_sip_tcp: true
+  rtp_start: 10000
+  rtp_end: 20000
+
+fail2ban:
+  enabled: true
+  maxretry: 5
+  findtime: 600
+  bantime: 86400
+
+ami:
+  lockdown: true
+  bind: 127.0.0.1
+
+ssh:
+  permit_root_login: false
+  password_authentication: false
+
+permissions:
+  enforce: true
+  owner: root
+  group: asterisk
+  conf_mode: "0640"
