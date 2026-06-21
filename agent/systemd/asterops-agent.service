@@ -1,0 +1,13 @@
+[Unit]
+Description=AsterOps posture scan & report
+After=network-online.target asterisk.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/asterops/agent.env
+ExecStart=/usr/local/bin/asterops report --profile ${ASTEROPS_PROFILE}
+User=root
+
+[Install]
+WantedBy=multi-user.target
