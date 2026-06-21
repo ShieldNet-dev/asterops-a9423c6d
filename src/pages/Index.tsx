@@ -106,7 +106,7 @@ function Hero() {
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-xs font-medium text-muted-foreground">
             <Radio className="size-3.5 text-brand" />
-            MIT Licensed · Asterisk 18 / 20 / 21 · TLS 1.3 + SRTP
+            Apache-2.0 · Python agent · Asterisk 18 / 20 / 22 · TLS 1.2+ + SRTP
           </div>
           <h1 className="font-display text-5xl font-semibold leading-[1.05] tracking-tighter md:text-6xl lg:text-7xl">
             The control plane for
