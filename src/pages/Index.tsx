@@ -180,7 +180,7 @@ function SiteFooter() {
           <a href="https://github.com/ShieldNet-dev/AsterOps/blob/main/LICENSE" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground">Apache-2.0</a>
           <a href="https://github.com/ShieldNet-dev/AsterOps#quick-start" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground">Docs</a>
           <a href="#setup" className="transition-colors hover:text-foreground">Setup</a>
-          <a href="#demo" className="transition-colors hover:text-foreground">Contact</a>
+          
         </div>
       </div>
     </footer>
@@ -878,41 +878,6 @@ function FAQItem({ q, a, defaultOpen = false }: { q: string; a: string; defaultO
   );
 }
 
-/* ─────────────── 11. Demo CTA ─────────────── */
-
-function DemoCTA() {
-  return (
-    <section id="demo" className="relative overflow-hidden bg-background py-24 md:py-32">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,_hsl(var(--brand)/0.10),_transparent_60%)]" />
-      <div className="mx-auto max-w-4xl px-6 text-center">
-        <div className="mb-6 flex justify-center">
-          <Brand size="xl" />
-        </div>
-        <h2 className="font-display text-4xl font-semibold tracking-tight md:text-5xl">
-          See AsterOps run your fleet in 20 minutes.
-        </h2>
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-          We'll walk through your current Asterisk setup, install the agent on one PBX live, and show you the dashboard, ledger, and rollback flow end-to-end.
-        </p>
-        <div className="mt-10 flex flex-wrap justify-center gap-4">
-          <a href="mailto:demo@asterops.io?subject=AsterOps%20demo">
-            <Button size="lg" className="px-10 text-base">
-              Book a demo <ArrowRight className="ml-2 size-4" />
-            </Button>
-          </a>
-          <a href="#product">
-            <Button size="lg" variant="outline" className="px-8 text-base">
-              <PlayCircle className="mr-2 size-4" /> Watch the 90-sec tour
-            </Button>
-          </a>
-        </div>
-        <div className="mt-6 text-xs text-muted-foreground">
-          Or email <a href="mailto:hello@asterops.io" className="underline-offset-4 hover:underline">hello@asterops.io</a>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* ─────────────── Setup / How to install ─────────────── */
 
