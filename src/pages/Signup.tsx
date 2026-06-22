@@ -32,7 +32,13 @@ function SignupPage() {
       },
     });
     setSubmitting(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      const msg = /failed to fetch/i.test(error.message)
+        ? "Network blocked in this preview. Sign-up works on the deployed URL — or open the preview in a new tab."
+        : error.message;
+      toast.error(msg);
+      return;
+    }
     toast.success("Check your email to confirm your account.");
     navigate("/login");
   }
