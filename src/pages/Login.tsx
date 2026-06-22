@@ -25,7 +25,10 @@ function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setSubmitting(false);
     if (error) {
-      toast.error(error.message);
+      const msg = /failed to fetch/i.test(error.message)
+        ? "Network blocked in this preview. Sign-in works on the deployed URL — or open the preview in a new tab."
+        : error.message;
+      toast.error(msg);
       return;
     }
     navigate("/dashboard");
