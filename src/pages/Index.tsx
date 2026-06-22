@@ -199,26 +199,26 @@ function Hero() {
             <Radio className="size-3.5 text-brand" />
             Apache-2.0 · Python agent · Asterisk 18 / 20 / 22 · TLS 1.2+ + SRTP
           </div>
-          <h1 className="font-display text-5xl font-semibold leading-[1.05] tracking-tighter md:text-6xl lg:text-7xl">
+          <h1 className="font-display text-5xl font-semibold leading-[1.05] tracking-tighter text-foreground md:text-6xl lg:text-7xl">
             The control plane for
             <br />
-            <span className="text-brand">production Asterisk fleets.</span>
+            production Asterisk fleets.
           </h1>
           <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             AsterOps provisions, secures, and audits every PBX in your fleet from one dashboard —
             without exposing inbound ports, plaintext SIP, or a single hand-edited config file.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <a href="#demo">
-              <Button size="lg" className="px-8 text-base">
-                Book a 20-min demo <ArrowRight className="ml-2 size-4" />
-              </Button>
-            </a>
             <Link to="/signup">
-              <Button size="lg" variant="outline" className="px-8 text-base">
-                Try the dashboard
+              <Button size="lg" className="px-8 text-base">
+                Try the dashboard <ArrowRight className="ml-2 size-4" />
               </Button>
             </Link>
+            <a href="https://github.com/ShieldNet-dev/AsterOps" target="_blank" rel="noreferrer">
+              <Button size="lg" variant="outline" className="gap-2 px-8 text-base">
+                <Github className="size-4" /> View on GitHub
+              </Button>
+            </a>
           </div>
           <div className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-muted-foreground">
             <span className="flex items-center gap-2"><CheckCircle2 className="size-4 text-status-ok" /> No inbound ports</span>
