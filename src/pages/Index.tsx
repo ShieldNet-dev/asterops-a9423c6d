@@ -64,24 +64,105 @@ function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-lg">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         <Brand size="md" />
-        <nav className="hidden gap-8 text-sm font-medium text-muted-foreground md:flex">
-          <a href="#product" className="transition-colors hover:text-foreground">Product</a>
-          <a href="#architecture" className="transition-colors hover:text-foreground">Architecture</a>
-          <a href="#security" className="transition-colors hover:text-foreground">Security</a>
-          <a href="#deployment" className="transition-colors hover:text-foreground">Deployment</a>
-          <a href="#setup" className="transition-colors hover:text-foreground">Setup</a>
-          <a href="#faq" className="transition-colors hover:text-foreground">FAQ</a>
-        </nav>
-        <div className="flex items-center gap-1">
-          <ThemeToggle />
-          <a href="https://github.com/ShieldNet-dev/AsterOps" target="_blank" rel="noreferrer" className="hidden md:inline-flex" aria-label="GitHub">
-            <Button variant="ghost" size="sm"><Github className="size-4" /></Button>
+        <div className="flex items-center gap-2">
+          <a
+            href="https://github.com/ShieldNet-dev/AsterOps"
+            target="_blank"
+            rel="noreferrer"
+            className="hidden sm:inline-flex"
+          >
+            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+              <Github className="size-4" /> GitHub
+            </Button>
           </a>
-          <Link to="/login"><Button variant="ghost" size="sm">Sign in</Button></Link>
-          <a href="#demo"><Button size="sm">Book a demo</Button></a>
+          <Link to="/login" className="hidden sm:inline-flex">
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+              Sign in
+            </Button>
+          </Link>
+          <ThemeToggle />
+          <SiteMenu />
         </div>
       </div>
     </header>
+  );
+}
+
+function SiteMenu() {
+  const [open, setOpen] = useState(false);
+  const sections = [
+    { href: "#product", label: "Product", icon: Activity, desc: "The dashboard at a glance" },
+    { href: "#architecture", label: "Architecture", icon: Network, desc: "Outbound agent, mTLS, signed configs" },
+    { href: "#features", label: "Core features", icon: ShieldCheck, desc: "Provisioning, audit, rollback" },
+    { href: "#security", label: "Security", icon: Lock, desc: "How we harden the SIP surface" },
+    { href: "#deployment", label: "Deployment", icon: Cloud, desc: "Cloud, self-hosted, hybrid" },
+    { href: "#setup", label: "Setup", icon: Terminal, desc: "Install in four commands" },
+    { href: "#faq", label: "FAQ", icon: BookOpen, desc: "Common operator questions" },
+  ];
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2">
+          <Menu className="size-4" /> <span className="hidden sm:inline">Menu</span>
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="right" className="w-full max-w-md overflow-y-auto p-0">
+        <SheetHeader className="border-b border-border px-6 py-5 text-left">
+          <SheetTitle className="font-display text-lg font-semibold tracking-tight">
+            Explore AsterOps
+          </SheetTitle>
+          <SheetDescription className="text-sm text-muted-foreground">
+            An open-source control plane for Asterisk fleets.
+          </SheetDescription>
+        </SheetHeader>
+        <nav className="flex flex-col p-3">
+          {sections.map((s) => (
+            <a
+              key={s.href}
+              href={s.href}
+              onClick={() => setOpen(false)}
+              className="group flex items-start gap-3 rounded-lg px-3 py-3 transition-colors hover:bg-surface"
+            >
+              <span className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground group-hover:text-foreground">
+                <s.icon className="size-4" strokeWidth={1.8} />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-medium text-foreground">{s.label}</span>
+                <span className="block text-xs text-muted-foreground">{s.desc}</span>
+              </span>
+            </a>
+          ))}
+        </nav>
+        <div className="mt-2 grid gap-2 border-t border-border px-6 py-5">
+          <a
+            href="https://github.com/ShieldNet-dev/AsterOps"
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => setOpen(false)}
+          >
+            <Button variant="outline" className="w-full justify-start gap-2">
+              <Github className="size-4" /> Star on GitHub
+            </Button>
+          </a>
+          <a
+            href="https://github.com/ShieldNet-dev/AsterOps#readme"
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => setOpen(false)}
+          >
+            <Button variant="outline" className="w-full justify-start gap-2">
+              <FileCode2 className="size-4" /> Documentation
+            </Button>
+          </a>
+          <Link to="/login" onClick={() => setOpen(false)}>
+            <Button variant="outline" className="w-full justify-start">Sign in</Button>
+          </Link>
+          <Link to="/signup" onClick={() => setOpen(false)}>
+            <Button className="w-full justify-start">Get started</Button>
+          </Link>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }
 
