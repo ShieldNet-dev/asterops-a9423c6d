@@ -3,6 +3,14 @@ import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
   ShieldCheck,
   ScrollText,
   Server,
@@ -20,9 +28,12 @@ import {
   AlertTriangle,
   Quote,
   ChevronDown,
-  PlayCircle,
   Phone,
   Globe2,
+  Menu,
+  BookOpen,
+  Terminal,
+  FileCode2,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -41,7 +52,6 @@ function Index() {
       <DeploymentModels />
       <FAQSection />
       <SetupSection />
-      <DemoCTA />
       <SiteFooter />
     </div>
   );
