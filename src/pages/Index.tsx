@@ -64,7 +64,7 @@ function SiteHeader() {
         </nav>
         <div className="flex items-center gap-1">
           <ThemeToggle />
-          <a href="https://github.com/asterops/asterops" target="_blank" rel="noreferrer" className="hidden md:inline-flex" aria-label="GitHub">
+          <a href="https://github.com/ShieldNet-dev/AsterOps" target="_blank" rel="noreferrer" className="hidden md:inline-flex" aria-label="GitHub">
             <Button variant="ghost" size="sm"><Github className="size-4" /></Button>
           </a>
           <Link to="/login"><Button variant="ghost" size="sm">Sign in</Button></Link>
@@ -84,10 +84,10 @@ function SiteFooter() {
           <span>Open control plane for Asterisk fleets</span>
         </div>
         <div className="flex flex-wrap justify-center gap-8">
-          <a href="https://github.com/asterops/asterops" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"><Github className="size-3.5" /> GitHub</a>
+          <a href="https://github.com/ShieldNet-dev/AsterOps" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"><Github className="size-3.5" /> GitHub</a>
           <a href="#security" className="transition-colors hover:text-foreground">Security</a>
-          <a href="https://github.com/asterops/asterops/blob/main/LICENSE" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground">Apache-2.0</a>
-          <a href="https://github.com/asterops/asterops#quick-start" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground">Docs</a>
+          <a href="https://github.com/ShieldNet-dev/AsterOps/blob/main/LICENSE" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground">Apache-2.0</a>
+          <a href="https://github.com/ShieldNet-dev/AsterOps#quick-start" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground">Docs</a>
           <a href="#setup" className="transition-colors hover:text-foreground">Setup</a>
           <a href="#demo" className="transition-colors hover:text-foreground">Contact</a>
         </div>
@@ -147,7 +147,7 @@ function ProductScreenshot() {
     <section id="product" className="border-b border-border bg-surface py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">The dashboard</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">The dashboard</span>
           <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight">
             Every PBX in your fleet, on one screen.
           </h2>
@@ -318,7 +318,7 @@ function ProblemStatement() {
     <section className="border-b border-border bg-background py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto mb-14 max-w-3xl text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">The problem</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">The problem</span>
           <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight">
             Running Asterisk at scale is a security and operations nightmare.
           </h2>
@@ -349,7 +349,7 @@ function ArchitectureDiagram() {
     <section id="architecture" className="border-b border-border bg-surface py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto mb-14 max-w-3xl text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">Architecture</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Architecture</span>
           <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight">
             Outbound-only agent. Encrypted by default. Signed and auditable.
           </h2>
@@ -477,7 +477,7 @@ function CoreFeatures() {
     <section id="features" className="border-b border-border bg-background py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto mb-14 max-w-3xl text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">Core features</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Core features</span>
           <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight">
             Operational confidence, built into the platform.
           </h2>
@@ -506,7 +506,7 @@ function SecuritySection() {
       <div className="mx-auto max-w-7xl px-6">
         <div className="grid gap-16 lg:grid-cols-5">
           <div className="lg:col-span-2">
-            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">Security</span>
+            <span className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Security</span>
             <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight">
               Hardened for real SIP attacks.
             </h2>
@@ -576,7 +576,7 @@ function UseCases() {
     <section className="border-b border-border bg-background py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto mb-14 max-w-3xl text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">Use cases</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Use cases</span>
           <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight">
             Built for teams that can't afford a bad call.
           </h2>
@@ -630,7 +630,7 @@ function Testimonials() {
     <section className="border-b border-border bg-surface py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto mb-14 max-w-3xl text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">Testimonials</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Testimonials</span>
           <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight">
             What operators are saying.
           </h2>
@@ -687,7 +687,7 @@ function DeploymentModels() {
     <section id="deployment" className="border-b border-border bg-background py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto mb-14 max-w-3xl text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">Deployment</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Deployment</span>
           <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight">
             Deploy it however your security team likes it.
           </h2>
@@ -750,7 +750,7 @@ function FAQSection() {
     <section id="faq" className="border-b border-border bg-surface py-20 md:py-28">
       <div className="mx-auto max-w-3xl px-6">
         <div className="mb-12 text-center">
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-brand">FAQ</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">FAQ</span>
           <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight">
             Questions operators ask us first.
           </h2>
@@ -853,7 +853,7 @@ function SetupSection() {
     <section id="setup" className="relative border-y border-border bg-surface py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-12 max-w-2xl">
-          <div className="text-xs font-semibold uppercase tracking-widest text-brand">Setup</div>
+          <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Setup</div>
           <h2 className="mt-3 font-display text-4xl font-semibold tracking-tight md:text-5xl">
             From zero to hardened PBX in four commands.
           </h2>
@@ -896,7 +896,7 @@ function SetupSection() {
             <pre className="px-6 py-6 text-sm font-mono leading-relaxed text-foreground whitespace-pre-wrap break-words">{steps[step].code}</pre>
             <div className="border-t border-border bg-surface-2 px-6 py-4 text-xs text-muted-foreground">
               Full docs &amp; profiles on GitHub →{" "}
-              <a className="text-brand hover:underline" href="https://github.com/asterops/asterops" target="_blank" rel="noreferrer">
+              <a className="text-brand hover:underline" href="https://github.com/ShieldNet-dev/AsterOps" target="_blank" rel="noreferrer">
                 github.com/asterops/asterops
               </a>
             </div>
