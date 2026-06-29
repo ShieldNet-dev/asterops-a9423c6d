@@ -26,8 +26,6 @@
 - [Highlights](#highlights)
 - [Architecture](#architecture)
 - [Getting Started](#getting-started)
-- [Repository Structure](#repository-structure)
-- [Security Architecture](#security-architecture)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
