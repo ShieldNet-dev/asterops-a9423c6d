@@ -54,3 +54,105 @@ It started as a university project on automated VoIP security hardening and it c
 - Multi-Server Management
 
 ---
+
+## Highlights
+
+### Security Hardening Engine
+
+Automatically applies opinionated security baselines to Asterisk deployments, helping reduce attack surface while maintaining repeatable and auditable configurations.
+
+**Includes:**
+
+- TLS 1.2+ configuration
+- SRTP enforcement
+- Fail2Ban integration
+- iptables / nftables configuration
+- AMI hardening
+- SSH hardening
+- File permission enforcement
+- Firewall configuration 
+- Automatic configuration backups
+- Dry-run support before applying changes
+
+---
+
+### Automated Configuration
+
+Define your infrastructure once using simple YAML files and let AsterOps generate deterministic manageable Asterisk configuration files.
+
+Supported configuration generation includes:
+
+- `pjsip.conf`
+- `extensions.conf`
+- `rtp.conf`
+
+The same input always produces the same output, reducing configuration drift and minimizing human error.
+
+---
+
+### Security Posture & Compliance Reporting
+
+Continuously assess the security posture of every managed server.
+
+Generate:
+
+- JSON reports
+- Standalone HTML reports
+- PDF exports
+
+Each report includes:
+
+- Security score (0–100)
+- Individual security checks
+- QoS results
+- Recommended remediation steps
+
+Reports can be uploaded automatically to the centralized dashboard for fleet-wide visibility.
+
+---
+
+### 🖥️ Centralized Server Management
+
+Manage multiple Asterisk servers from a single dashboard.
+
+Capabilities include:
+
+- Server overview
+- Security posture monitoring
+- Provisioning workspace
+- Audit logs
+- Call records
+- Alert management
+
+Designed for organizations managing multiple PBX deployments.
+
+---
+
+### Extensible Platform Architecture
+
+AsterOps is designed around a modular platform abstraction.
+
+While Asterisk is currently the primary supported platform, the architecture allows additional VoIP platforms to be integrated through a lightweight `VoipPlatform` interface.
+
+Future platform support includes:
+
+- FreeSWITCH
+- Kamailio
+- OpenSIPS
+
+---
+
+### Built for Reliability
+
+Quality is built into the development workflow.
+
+Current testing includes:
+
+- Golden-file renderer tests
+- Profile loader validation
+- Security scoring tests
+- Configuration generation verification
+
+The goal is predictable, repeatable infrastructure automation that engineers can trust.
+
+---
