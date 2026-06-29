@@ -32,7 +32,7 @@
 
 ## Why AsterOps?
 
-Managing Asterisk infrastructure at scale is often repetitive, error-prone, and difficult to standardize. Security hardening is frequently performed manually, configurations drift over time, and operational visibility is fragmented across multiple tools.
+Managing VoIP infrastructure at scale is often repetitive, error-prone, and difficult to standardize. Security hardening is frequently performed manually, configurations drift over time, and operational visibility is fragmented across multiple tools.
 
 **AsterOps** solves this by providing a centralized platform that automates provisioning, security hardening, compliance auditing, and Multiple server management for VoIP infrastructure.
 
