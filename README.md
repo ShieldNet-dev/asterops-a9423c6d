@@ -142,9 +142,9 @@ While Asterisk is currently the primary supported platform, the architecture all
 
 Future platform support includes:
 
-- `**FreeSWITCH**`
-- `**Kamailio**`
-- `**OpenSIPS**`
+- **`FreeSWITCH`**
+- **`Kamailio`**
+- **`OpenSIPS`**
 
 ---
 
