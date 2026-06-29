@@ -18,6 +18,20 @@
 
 ---
 
+## Table of Contents
+
+- [Dashboard Preview](#dashboard-preview)
+- [Why AsterOps?](#why-asterops)
+- [Core Features](#core-features)
+- [Highlights](#highlights)
+- [Architecture](#architecture)
+- [Getting Started](#getting-started)
+- [Repository Structure](#repository-structure)
+- [Security Architecture](#security-architecture)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Dashboard Preview
 
 > **A single control plane for provisioning, securing, monitoring, and auditing your VoIP infrastructure.**
