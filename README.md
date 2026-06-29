@@ -205,7 +205,7 @@ Supported PBX
 
 ✓ Asterisk 18
 ✓ Asterisk 20
-✓ Asterisk 22
+✓ Asterisk 22+
 ```
 
 ---
