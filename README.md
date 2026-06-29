@@ -2,7 +2,7 @@
 
 # AsterOps
 
-An Open-source Centralized Management System, automating security hardening integration, configurations and Security Audit for Asterisk servers.
+An **Open-source** Centralized Management System, automating security hardening integration, configurations and Security Audit for Asterisk servers.
 
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
