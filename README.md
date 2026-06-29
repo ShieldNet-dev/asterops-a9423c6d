@@ -322,4 +322,64 @@ asterops report --profile baseline
 
 ---
 
+## Roadmap
+
+AsterOps is under active development. The roadmap below outlines the planned evolution of the platform.
+
+### Phase 1 — Foundation
+
+- Automated Security Hardening
+- Configuration as Code
+- Security Profiles
+- Compliance Reporting
+- Centralized Dashboard
+- Agent-based Architecture
+
+---
+
+### Phase 2 — Platform Expansion
+
+- FreeSWITCH Support
+- Kamailio Support
+- OpenSIPS Support
+- Enhanced Audit Logging
+- Kubernetes Deployment
+
+---
+
+
+## Contributing
+
+Contributions of all sizes are welcome.
+
+Whether you're fixing a typo, improving documentation, reporting bugs, or implementing new features, every contribution helps make AsterOps better.
+
+
+Please ensure:
+
+- New functionality includes appropriate tests.
+- Existing tests continue to pass.
+- Documentation is updated where necessary.
+- Pull requests remain focused on a single feature or fix.
+
+---
+
+## Reporting Issues
+
+Found a bug?
+
+Have a feature request?
+
+Please open an issue describing:
+
+- Expected behavior
+- Actual behavior
+- Steps to reproduce
+- Environment details
+- Relevant logs (if available)
+
+Clear and reproducible reports help us resolve issues faster.
+
+---
+
 
