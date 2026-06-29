@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/images/logo.png" alt="AsterOps Logo" width="180">
+<img src="/assets/asterops-logo.png" alt="AsterOps Logo" width="180">
 
 # AsterOps
 
