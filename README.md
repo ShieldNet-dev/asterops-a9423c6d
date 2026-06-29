@@ -5,6 +5,7 @@
 <div align="left">
 An Open-source Centralized Management System, automating security hardening integration, configurations and Security Audit for Asterisk servers.
 
+<div align="center">
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-3776AB.svg?logo=python&logoColor=white)](https://www.python.org)
 [![React](https://img.shields.io/badge/dashboard-React_18-61DAFB.svg?logo=react&logoColor=black)](https://react.dev)
