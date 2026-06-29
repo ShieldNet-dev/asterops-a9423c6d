@@ -181,3 +181,145 @@ Each managed server runs a local **AsterOps Agent**, responsible for provisionin
 
 
 ---
+
+# Getting Started
+
+Get AsterOps running in minutes.
+
+## Prerequisites
+
+Before installing AsterOps, ensure your environment meets the following requirements.
+
+```text
+Operating System
+
+✓ Linux
+✓ Ubuntu 22.04+ (Recommended)
+✓ Debian 12+
+
+Python
+
+✓ Python 3.10+
+
+Supported PBX
+
+✓ Asterisk 18
+✓ Asterisk 20
+✓ Asterisk 22
+```
+
+---
+
+## Installation
+
+Install the AsterOps Agent on your PBX.
+
+```bash
+pip install asterops-agent
+```
+
+Verify the installation.
+
+```bash
+asterops --version
+```
+
+View the available security profiles.
+
+```bash
+sudo asterops profiles
+```
+
+---
+
+## Security Hardening
+
+Preview all planned changes without modifying your server.
+
+```bash
+sudo asterops run --profile baseline --dry-run
+```
+
+Apply the selected security profile.
+
+```bash
+sudo asterops run --profile baseline
+```
+
+---
+
+## Provision Your PBX
+
+Create an inventory file.
+
+```yaml
+server_name: hq-pbx-01
+
+tls_only: true
+
+rtp_start: 10000
+
+rtp_end: 20000
+
+endpoints:
+
+  - extension: "1001"
+
+    display_name: "Reception"
+
+    codecs:
+
+      - opus
+      - ulaw
+      - alaw
+
+    tls_required: true
+
+    srtp_required: true
+
+trunks:
+
+  - name: telnyx-primary
+
+    host: sip.telnyx.com
+
+    port: 5061
+
+    username: my-trunk-user
+
+    transport: transport-tls
+
+    srtp_required: true
+```
+
+Generate and apply the configuration.
+
+```bash
+sudo asterops provision inventory.yaml --dry-run
+
+sudo asterops provision inventory.yaml
+
+sudo asterisk -rx "pjsip reload"
+```
+
+---
+
+## Upload Security Reports
+
+Configure the agent.
+
+```bash
+export ASTEROPS_URL=https://your-control-plane/functions/v1
+
+export ASTEROPS_AGENT_TOKEN=YOUR_TOKEN
+```
+
+Generate and upload a report.
+
+```bash
+asterops report --profile baseline
+```
+
+---
+
+
