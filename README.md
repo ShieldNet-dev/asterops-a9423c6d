@@ -164,3 +164,20 @@ Current testing includes:
 The goal is predictable, repeatable infrastructure automation that engineers can trust.
 
 ---
+
+## Architecture
+
+AsterOps follows a lightweight agent-based architecture designed for secure, scalable, and centralized VoIP infrastructure management.
+
+Each managed server runs a local **AsterOps Agent**, responsible for provisioning, security hardening, verification, and reporting. The agent communicates securely with the centralized control plane, allowing administrators to manage multiple deployments without exposing SSH access or directly modifying remote systems.
+
+<p align="center">
+
+<!-- Replace with architecture diagram -->
+
+<img src="src/assets/architecture.png" alt="AsterOps Architecture">
+
+</p>
+
+
+---
