@@ -44,6 +44,7 @@ It started as a university project on automated VoIP security hardening and it c
 
 ## Core Features
 
+``` text
 - Automated VoIP Provisioning
 - Security Hardening Engine
 - TLS & SRTP Enforcement
@@ -52,6 +53,7 @@ It started as a university project on automated VoIP security hardening and it c
 - Compliance Reporting
 - Audit Logging
 - Multi-Server Management
+```
 
 ---
 
@@ -63,6 +65,7 @@ Automatically applies opinionated security baselines to Asterisk deployments, he
 
 **Includes:**
 
+``` text
 - TLS 1.2+ configuration
 - SRTP enforcement
 - Fail2Ban integration
@@ -73,6 +76,7 @@ Automatically applies opinionated security baselines to Asterisk deployments, he
 - Firewall configuration 
 - Automatic configuration backups
 - Dry-run support before applying changes
+```
 
 ---
 
@@ -96,16 +100,16 @@ Continuously assess the security posture of every managed server.
 
 Generate:
 
-- JSON reports
-- Standalone HTML reports
-- PDF exports
+- `JSON reports`
+- `Standalone HTML reports`
+- `PDF exports`
 
 Each report includes:
 
-- Security score (0–100)
-- Individual security checks
-- QoS results
-- Recommended remediation steps
+- `Security score (0–100)`
+- `Individual security checks`
+- `QoS results`
+- `Recommended remediation steps`
 
 Reports can be uploaded automatically to the centralized dashboard for fleet-wide visibility.
 
@@ -117,12 +121,14 @@ Manage multiple Asterisk servers from a single dashboard.
 
 Capabilities include:
 
+``` text
 - Server overview
 - Security posture monitoring
 - Provisioning workspace
 - Audit logs
 - Call records
 - Alert management
+```
 
 Designed for organizations managing multiple PBX deployments.
 
@@ -136,9 +142,9 @@ While Asterisk is currently the primary supported platform, the architecture all
 
 Future platform support includes:
 
-- FreeSWITCH
-- Kamailio
-- OpenSIPS
+- `**FreeSWITCH**`
+- `**Kamailio**`
+- `**OpenSIPS**`
 
 ---
 
@@ -148,10 +154,12 @@ Quality is built into the development workflow.
 
 Current testing includes:
 
+``` text
 - Golden-file renderer tests
 - Profile loader validation
 - Security scoring tests
 - Configuration generation verification
+```
 
 The goal is predictable, repeatable infrastructure automation that engineers can trust.
 
