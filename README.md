@@ -24,7 +24,7 @@
 
 <p align="center">
 
-<img src="docs/images/dashboard.png" alt="AsterOps Dashboard">
+<img src="src/assets/dashboard.png" alt="AsterOps Dashboard">
 
 </p>
 
