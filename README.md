@@ -4,8 +4,6 @@
 
 # AsterOps
 
-### Secure. Provision. Manage. Audit.
-
 **An open-source platform for centralized VoIP infrastructure management, automated security hardening, and compliance auditing.**
 
 <br>
