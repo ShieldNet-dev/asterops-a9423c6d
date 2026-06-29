@@ -3,6 +3,7 @@
 <img src="src/assets/asterops-logo.png" alt="AsterOps Logo" width="360">
 
 
+
 **An open-source platform for centralized VoIP infrastructure management, automated security hardening, and compliance auditing.**
 
 <br>
