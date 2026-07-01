@@ -25,19 +25,18 @@ function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setSubmitting(false);
     if (error) {
-      const msg = /failed to fetch/i.test(error.message)
-        ? "Network blocked in this preview. Sign-in works on the deployed URL — or open the preview in a new tab."
-        : error.message;
-      toast.error(msg);
+      toast.error(formatAuthError(error.message));
       return;
     }
     navigate("/dashboard");
   }
 
   async function onGoogle() {
-    const result = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin + "/dashboard", } });
-    if (result.error) { toast.error("Sign-in failed"); return; }
-        navigate("/dashboard");
+    const result = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/dashboard` },
+    });
+    if (result.error) toast.error(formatAuthError(result.error.message));
   }
 
   return (
@@ -84,6 +83,13 @@ function LoginPage() {
       </div>
     </div>
   );
+}
+
+function formatAuthError(message: string) {
+  if (/failed to fetch|network|fetch/i.test(message)) {
+    return "Authentication service is unreachable. Please make sure the AsterOps backend is active, then try again.";
+  }
+  return message;
 }
 
 export default LoginPage;
