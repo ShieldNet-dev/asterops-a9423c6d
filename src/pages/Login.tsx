@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Brand } from "@/components/brand";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 function LoginPage() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -14,6 +16,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) navigate("/dashboard");
@@ -22,22 +25,28 @@ function LoginPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
+    setAuthError(null);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setSubmitting(false);
     if (error) {
-      const msg = /failed to fetch/i.test(error.message)
-        ? "Network blocked in this preview. Sign-in works on the deployed URL — or open the preview in a new tab."
-        : error.message;
-      toast.error(msg);
+      const message = formatAuthError(error.message);
+      setAuthError(message);
+      toast.error(message);
       return;
     }
     navigate("/dashboard");
   }
 
   async function onGoogle() {
-    const result = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.origin + "/dashboard", } });
-    if (result.error) { toast.error("Sign-in failed"); return; }
-        navigate("/dashboard");
+    const result = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/dashboard` },
+    });
+    if (result.error) {
+      const message = formatAuthError(result.error.message);
+      setAuthError(message);
+      toast.error(message);
+    }
   }
 
   return (
@@ -51,6 +60,13 @@ function LoginPage() {
           <p className="mt-1 text-sm text-muted-foreground">
             Access your AsterOps control plane.
           </p>
+          {authError && (
+            <Alert variant="destructive" className="mt-5">
+              <AlertCircle className="size-4" />
+              <AlertTitle>Sign in unavailable</AlertTitle>
+              <AlertDescription>{authError}</AlertDescription>
+            </Alert>
+          )}
           <Button
             type="button"
             variant="outline"
@@ -84,6 +100,13 @@ function LoginPage() {
       </div>
     </div>
   );
+}
+
+function formatAuthError(message: string) {
+  if (/failed to fetch|network|fetch/i.test(message)) {
+    return "Authentication service is unreachable. The Supabase project configured for AsterOps is not responding, so sign in cannot complete until the backend is resumed or replaced with an active Supabase project.";
+  }
+  return message;
 }
 
 export default LoginPage;
