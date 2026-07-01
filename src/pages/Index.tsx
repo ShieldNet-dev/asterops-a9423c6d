@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Brand } from "@/components/brand";
+import logoUrl from "@/assets/asterops-logo.png";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
@@ -16,7 +17,6 @@ import {
   ArrowRight,
   BookOpen,
   Building2,
-  CheckCircle2,
   ChevronDown,
   Cloud,
   FileCode2,
@@ -37,15 +37,25 @@ import {
 const GITHUB_URL = "https://github.com/ShieldNet-dev/AsterOps";
 
 function Index() {
+  const [showSecurity, setShowSecurity] = useState(false);
+
+  const revealSecurity = () => {
+    setShowSecurity(true);
+    window.setTimeout(() => {
+      document.getElementById("security-details")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
+      <SiteHeader onSecurityClick={revealSecurity} />
       <LogoPanel />
       <Hero />
       <ProblemStatement />
       <ArchitectureDiagram />
       <SetupSection />
       <CoreFeatures />
+      {showSecurity && <SecurityDetails />}
       <UseCases />
       <DeploymentModels />
       <FAQSection />
@@ -54,7 +64,7 @@ function Index() {
   );
 }
 
-function SiteHeader() {
+function SiteHeader({ onSecurityClick }: { onSecurityClick: () => void }) {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-lg">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
@@ -71,14 +81,14 @@ function SiteHeader() {
             </Button>
           </Link>
           <ThemeToggle />
-          <SiteMenu />
+          <SiteMenu onSecurityClick={onSecurityClick} />
         </div>
       </div>
     </header>
   );
 }
 
-function SiteMenu() {
+function SiteMenu({ onSecurityClick }: { onSecurityClick: () => void }) {
   const [open, setOpen] = useState(false);
   const sections = [
     { href: "#problem", label: "Problem", icon: Activity, desc: "Why Asterisk fleets drift" },
@@ -88,7 +98,7 @@ function SiteMenu() {
     { href: "#use-cases", label: "Use cases", icon: Building2, desc: "Teams AsterOps supports" },
     { href: "#deployment", label: "Deployment", icon: Cloud, desc: "Cloud, self-hosted, hybrid" },
     { href: "#faq", label: "FAQ", icon: BookOpen, desc: "Short answers" },
-    { href: "/security", label: "Security", icon: Lock, desc: "Security posture dashboard" },
+    { href: "#security-details", label: "Security", icon: Lock, desc: "Security model", action: onSecurityClick },
   ];
 
   return (
@@ -107,7 +117,6 @@ function SiteMenu() {
         </SheetHeader>
         <nav className="flex flex-col p-3">
           {sections.map((section) => {
-            const isRoute = section.href.startsWith("/");
             const content = (
               <>
                 <span className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground group-hover:text-foreground">
@@ -121,12 +130,16 @@ function SiteMenu() {
             );
             const className = "group flex items-start gap-3 rounded-lg px-3 py-3 transition-colors hover:bg-surface";
 
-            return isRoute ? (
-              <Link key={section.href} to={section.href} onClick={() => setOpen(false)} className={className}>
-                {content}
-              </Link>
-            ) : (
-              <a key={section.href} href={section.href} onClick={() => setOpen(false)} className={className}>
+            return (
+              <a
+                key={section.href}
+                href={section.href}
+                onClick={() => {
+                  section.action?.();
+                  setOpen(false);
+                }}
+                className={className}
+              >
                 {content}
               </a>
             );
@@ -154,10 +167,15 @@ function SiteMenu() {
 
 function LogoPanel() {
   return (
-    <section className="border-b border-border bg-surface py-10 md:py-14">
+    <section className="border-b border-border bg-surface py-8 md:py-12">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="flex min-h-40 items-center justify-center rounded-lg border border-border bg-background px-8 py-10 md:min-h-56">
-          <Brand size="xl" className="scale-125 md:scale-150" />
+        <div className="flex items-center justify-center">
+          <img
+            src={logoUrl}
+            alt="AsterOps"
+            className="w-full max-w-4xl rounded-xl border border-border bg-black object-contain shadow-sm"
+            draggable={false}
+          />
         </div>
       </div>
     </section>
