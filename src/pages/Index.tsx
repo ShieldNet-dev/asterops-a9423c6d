@@ -348,6 +348,29 @@ function CoreFeatures() {
   );
 }
 
+function SecurityDetails() {
+  const items = [
+    [Lock, "No inbound admin ports", "Agents connect out over HTTPS."],
+    [ShieldCheck, "Encrypted media", "Use TLS and SRTP profiles for SIP traffic."],
+    [ScrollText, "Audit trail", "Track user actions, config changes, and reports."],
+  ] as const;
+
+  return (
+    <section id="security-details" className="border-b border-border bg-surface py-16 md:py-24">
+      <SectionIntro label="Security" title="Security model." body="This section is shown from the menu so the main page stays focused." />
+      <div className="mx-auto mt-10 grid max-w-7xl gap-4 px-6 md:grid-cols-3">
+        {items.map(([Icon, title, body]) => (
+          <div key={title} className="rounded-lg border border-border bg-background p-5">
+            <Icon className="size-5 text-muted-foreground" strokeWidth={1.8} />
+            <h3 className="mt-4 font-display text-lg font-semibold tracking-tight">{title}</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">{body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function UseCases() {
   const cases = [
     [Phone, "Contact centers", "Keep PBX changes controlled across busy call environments."],
