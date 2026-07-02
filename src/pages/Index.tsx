@@ -49,8 +49,7 @@ function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader onSecurityClick={revealSecurity} />
-      <LogoPanel />
-      <Hero />
+      <LogoHero />
       <ProblemStatement />
       <ArchitectureDiagram />
       <SetupSection />
@@ -165,48 +164,36 @@ function SiteMenu({ onSecurityClick }: { onSecurityClick: () => void }) {
   );
 }
 
-function LogoPanel() {
+function LogoHero() {
   return (
-    <section className="border-b border-border bg-surface py-8 md:py-12">
+    <section className="bg-background py-10 md:py-16">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="flex items-center justify-center">
+        <div className="flex flex-col items-center text-center">
           <img
             src={logoUrl}
             alt="AsterOps"
-            className="w-full max-w-4xl rounded-xl border border-border bg-black object-contain shadow-sm"
+            className="w-full max-w-3xl object-contain"
             draggable={false}
           />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Hero() {
-  return (
-    <section className="border-b border-border bg-background py-16 md:py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="max-w-4xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground">
-            Apache-2.0 · Python agent · Asterisk first
-          </div>
-          <h1 className="font-display text-4xl font-semibold leading-tight tracking-tight text-foreground md:text-6xl">
-            The control plane for production Asterisk fleets.
-          </h1>
-          <p className="mt-6 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
-            AsterOps provisions, secures, and audits every PBX in your fleet from one dashboard.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link to="/signup">
-              <Button size="lg" className="gap-2">
-                Try the dashboard <ArrowRight className="size-4" />
-              </Button>
-            </Link>
-            <a href={GITHUB_URL} target="_blank" rel="noreferrer">
-              <Button size="lg" variant="outline" className="gap-2">
-                <Github className="size-4" /> View on GitHub
-              </Button>
-            </a>
+          <div className="mt-6 max-w-2xl">
+            <p className="text-base leading-7 text-muted-foreground md:text-lg">
+              The control plane for production Asterisk fleets. Provisions, secures, and audits every PBX from one dashboard.
+            </p>
+            <div className="mt-6 inline-flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground">
+              Apache-2.0 · Python agent · Asterisk first
+            </div>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Link to="/signup">
+                <Button size="lg" className="gap-2">
+                  Try the dashboard <ArrowRight className="size-4" />
+                </Button>
+              </Link>
+              <a href={GITHUB_URL} target="_blank" rel="noreferrer">
+                <Button size="lg" variant="outline" className="gap-2">
+                  <Github className="size-4" /> View on GitHub
+                </Button>
+              </a>
+            </div>
           </div>
         </div>
       </div>

@@ -7,8 +7,8 @@ type Mode = "light" | "dark";
 function getInitial(): Mode {
   if (typeof window === "undefined") return "light";
   const stored = window.localStorage.getItem("asterops-theme") as Mode | null;
-  if (stored === "light" || stored === "dark") return stored;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  if (stored === "dark") return "dark";
+  return "light";
 }
 
 function apply(mode: Mode) {

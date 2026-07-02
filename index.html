@@ -12,8 +12,7 @@
       (function () {
         try {
           var saved = localStorage.getItem("asterops-theme");
-          var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-          var theme = saved || (prefersDark ? "dark" : "light");
+          var theme = saved === "dark" ? "dark" : "light";
           if (theme === "dark") document.documentElement.classList.add("dark");
           document.documentElement.style.colorScheme = theme;
         } catch (e) {}
