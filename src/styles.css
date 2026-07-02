@@ -66,12 +66,12 @@
 }
 
 :root {
-  /* LIGHT theme (default) — warm paper white with deep slate ink. */
+  /* LIGHT theme (default) — clean white with deep slate ink. */
   --radius: 0.625rem;
-  --background: oklch(0.985 0.004 80);        /* near-white, warm */
+  --background: oklch(1 0 0);                  /* true white */
   --foreground: oklch(0.22 0.02 250);          /* deep slate */
   --surface: oklch(1 0 0);                     /* card white */
-  --surface-2: oklch(0.965 0.006 75);          /* subtle wash */
+  --surface-2: oklch(0.97 0.003 250);          /* subtle neutral wash */
   --card: var(--surface);
   --card-foreground: var(--foreground);
   --popover: var(--surface);
@@ -101,7 +101,7 @@
   --chart-3: oklch(0.7 0.16 70);
   --chart-4: oklch(0.55 0.18 250);
   --chart-5: oklch(0.5 0.02 250);
-  --sidebar: oklch(0.98 0.005 80);
+  --sidebar: oklch(1 0 0);
   --sidebar-foreground: var(--foreground);
   --sidebar-primary: var(--brand);
   --sidebar-primary-foreground: var(--brand-foreground);
