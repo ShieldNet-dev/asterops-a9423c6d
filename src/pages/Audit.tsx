@@ -15,7 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Download, ShieldCheck, Lock } from "lucide-react";
+import { Download, ShieldCheck, Lock, ScrollText } from "lucide-react";
+import { EmptyState } from "@/components/empty-state";
 
 function AuditPage() {
   const fetchEvents = useServerFn(listAuditEvents);
@@ -179,9 +180,11 @@ function AuditPage() {
 
       <div className="overflow-hidden rounded-xl border border-border bg-surface">
         {events.length === 0 ? (
-          <div className="px-6 py-16 text-center text-sm text-muted-foreground">
-            No audit events match these filters.
-          </div>
+          <EmptyState
+            icon={ScrollText}
+            title="No audit events yet"
+            description="Every configuration change, TLS rotation, and admin action is recorded here — append-only. Once you or the agent make a change, it'll show up."
+          />
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="border-b border-border bg-surface-2 text-xs uppercase tracking-wider text-muted-foreground">

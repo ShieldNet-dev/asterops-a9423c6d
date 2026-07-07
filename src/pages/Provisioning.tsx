@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Trash2, Wrench, Copy } from "lucide-react";
+import { Plus, Trash2, Wrench, Copy, Info } from "lucide-react";
 import { toast } from "sonner";
 
 type Endpoint = { extension: string; display_name: string; codecs: string };
@@ -37,6 +37,19 @@ export default function ProvisioningPage() {
           Define your extensions and trunks, then push deterministic Asterisk config to any server in your fleet.
         </p>
       </header>
+
+      {endpoints.length === 0 && trunks.length === 0 && (
+        <div className="flex items-start gap-3 rounded-xl border border-border bg-surface-2/40 p-4 text-sm">
+          <Info className="mt-0.5 size-4 shrink-0 text-brand" />
+          <div>
+            <div className="font-medium text-foreground">Start with the sample inventory below</div>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Edit the extensions and trunks on the left, then copy the generated <span className="font-mono">inventory.yaml</span>
+              {" "}or paste the apply command onto your PBX. Nothing is pushed until you run it there.
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-6 xl:grid-cols-[1fr_1.1fr]">
         <Card>

@@ -5,8 +5,9 @@ import { useState } from "react";
 import { listNotifications, acknowledgeNotification, certExpirySummary } from "@/lib/alerts.functions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Check, ShieldAlert, AlertTriangle, Info } from "lucide-react";
+import { Bell, Check, ShieldAlert, AlertTriangle, Info, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/empty-state";
 
 function AlertsPage() {
   const qc = useQueryClient();
@@ -60,9 +61,11 @@ function AlertsPage() {
           <ShieldAlert className="size-4 text-status-warn" />
         </div>
         {expiring.length === 0 ? (
-          <div className="px-6 py-10 text-center text-sm text-muted-foreground">
-            All certificates are healthy.
-          </div>
+          <EmptyState
+            icon={CheckCircle2}
+            title="All certificates are healthy"
+            description="Nothing is expiring soon. We'll warn you here well before any TLS certificate needs renewal."
+          />
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="border-b border-border bg-surface-2 text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -112,9 +115,15 @@ function AlertsPage() {
           </div>
         </div>
         {notes.length === 0 ? (
-          <div className="px-6 py-10 text-center text-sm text-muted-foreground">
-            {unackOnly ? "Nothing to acknowledge — your fleet looks healthy." : "No notifications yet."}
-          </div>
+          <EmptyState
+            icon={CheckCircle2}
+            title={unackOnly ? "You're all caught up" : "No notifications yet"}
+            description={
+              unackOnly
+                ? "There's nothing to acknowledge right now. New alerts will pop up here in real time."
+                : "Once an agent detects a certificate warning, reload failure, or TLS issue, you'll see it here."
+            }
+          />
         ) : (
           <ul className="divide-y divide-border">
             {notes.map((n: any) => (

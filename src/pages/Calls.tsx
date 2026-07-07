@@ -4,8 +4,10 @@ import { useMemo, useState } from "react";
 import { listCalls } from "@/lib/calls.functions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Download, ShieldCheck } from "lucide-react";
+import { Download, ShieldCheck, PhoneCall } from "lucide-react";
 import { CallsTable } from "./ServerDetail";
+import { EmptyState } from "@/components/empty-state";
+import { Link } from "react-router-dom";
 
 function CallsPage() {
   const [src, setSrc] = useState("");
@@ -57,7 +59,26 @@ function CallsPage() {
         <Button variant="ghost" size="sm" onClick={() => { setSrc(""); setDst(""); }}>Clear</Button>
       </div>
 
-      <CallsTable calls={calls} />
+      {calls.length === 0 ? (
+        <div className="rounded-xl border border-border bg-surface">
+          <EmptyState
+            icon={PhoneCall}
+            title={src || dst ? "No calls match those filters" : "No calls recorded yet"}
+            description={
+              src || dst
+                ? "Try clearing the source and destination filters, or widen the time range."
+                : "Once an enrolled PBX starts handling calls, every CDR will appear here — tamper-proof and exportable."
+            }
+            action={
+              !src && !dst ? (
+                <Link to="/servers"><Button size="sm" variant="outline">Enroll a server</Button></Link>
+              ) : undefined
+            }
+          />
+        </div>
+      ) : (
+        <CallsTable calls={calls} />
+      )}
     </div>
   );
 }
