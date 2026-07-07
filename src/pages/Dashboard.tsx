@@ -4,9 +4,11 @@ import { useServerFn } from "@/lib/_shim";
 import { listServers } from "@/lib/servers.functions";
 import { callStats } from "@/lib/calls.functions";
 import { certExpirySummary, listNotifications } from "@/lib/alerts.functions";
-import { ArrowRight, Server, ShieldCheck, PhoneCall, Lock, ShieldAlert, Bell } from "lucide-react";
+import { ArrowRight, Server, ShieldCheck, PhoneCall, ShieldAlert, Bell, KeyRound, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { OnboardingCard } from "@/components/onboarding-card";
+import { EmptyState } from "@/components/empty-state";
 
 function DashboardPage() {
   const fetchServers = useServerFn(listServers);
@@ -31,20 +33,99 @@ function DashboardPage() {
   const certAlerts = certItems.filter((i: any) => ["critical", "expired", "warn"].includes(i.severity));
   const notes = (notesQ.data?.notifications ?? []).slice(0, 6);
 
+  const soonestCert = [...certItems]
+    .filter((i: any) => typeof i.days_remaining === "number")
+    .sort((a: any, b: any) => a.days_remaining - b.days_remaining)[0];
+
+  const tlsLabel = !soonestCert
+    ? "—"
+    : soonestCert.severity === "expired"
+      ? "Expired"
+      : `${soonestCert.days_remaining}d`;
+  const tlsTone: KpiTone = !soonestCert
+    ? "neutral"
+    : ["expired", "critical"].includes(soonestCert.severity)
+      ? "err"
+      : soonestCert.severity === "warn"
+        ? "warn"
+        : "ok";
+
+  const serverTone: KpiTone =
+    servers.length === 0 ? "neutral" : online === servers.length ? "ok" : online === 0 ? "err" : "warn";
+
+  const isEmpty = servers.length === 0;
+
   return (
     <div className="space-y-10">
-      <div>
-        <h1 className="font-display text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Fleet-wide status across all registered Asterisk hosts.
-        </p>
-      </div>
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-3xl font-bold tracking-tight">Overview</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            A plain-English snapshot of every Asterisk PBX connected to AsterOps.
+          </p>
+        </div>
+        {!isEmpty && (
+          <Link to="/servers">
+            <Button size="sm">
+              <Server className="mr-2 size-3.5" /> Add another server
+            </Button>
+          </Link>
+        )}
+      </header>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <StatCard label="Servers" value={servers.length} icon={Server} sub={`${online} online · ${pending} pending`} />
-        <StatCard label="Calls (24h)" value={statsQ.data?.total24h ?? 0} icon={PhoneCall} sub={`${statsQ.data?.answered24h ?? 0} answered`} />
-        <StatCard label="Encrypted (24h)" value={statsQ.data?.encrypted24h ?? 0} icon={Lock} sub="TLS / SRTP" />
-        <StatCard label="Avg duration" value={fmtDuration(statsQ.data?.avgDurationSec ?? 0)} icon={ShieldCheck} sub="last 24h" />
+      {isEmpty && <OnboardingCard />}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <Kpi
+          label="Connected servers"
+          value={servers.length}
+          hint={
+            isEmpty
+              ? "No PBX has checked in yet."
+              : `${online} online · ${pending} pending${servers.length - online - pending > 0 ? ` · ${servers.length - online - pending} offline` : ""}`
+          }
+          badge={isEmpty ? "Waiting for first agent" : online === servers.length ? "All healthy" : `${online}/${servers.length} online`}
+          tone={serverTone}
+          icon={Server}
+        />
+        <Kpi
+          label="Recent calls"
+          value={statsQ.data?.total24h ?? 0}
+          hint={`in the last 24 hours · ${statsQ.data?.answered24h ?? 0} answered · avg ${fmtDuration(statsQ.data?.avgDurationSec ?? 0)}`}
+          badge={isEmpty ? "Nothing to show yet" : `${statsQ.data?.encrypted24h ?? 0} encrypted`}
+          tone={isEmpty ? "neutral" : "ok"}
+          icon={PhoneCall}
+        />
+        <Kpi
+          label="Security posture"
+          value={isEmpty ? "—" : (certAlerts.length === 0 ? "Healthy" : `${certAlerts.length} issue${certAlerts.length === 1 ? "" : "s"}`)}
+          hint={
+            isEmpty
+              ? "Run asterops report to see a hardening score."
+              : certAlerts.length === 0
+                ? "TLS, SRTP, firewall and AMI checks are passing."
+                : "One or more servers need attention."
+          }
+          badge={isEmpty ? "Not scanned" : certAlerts.length === 0 ? "OK" : "Attention"}
+          tone={isEmpty ? "neutral" : certAlerts.length === 0 ? "ok" : "warn"}
+          icon={ShieldCheck}
+        />
+        <Kpi
+          label="TLS certificates"
+          value={tlsLabel}
+          hint={
+            !soonestCert
+              ? "No certificates reported yet."
+              : soonestCert.severity === "expired"
+                ? `${soonestCert.name} certificate has expired.`
+                : `${soonestCert.name} expires soonest.`
+          }
+          badge={
+            tlsTone === "err" ? "Renew now" : tlsTone === "warn" ? "Renew soon" : tlsTone === "ok" ? "All good" : "No data"
+          }
+          tone={tlsTone}
+          icon={KeyRound}
+        />
       </div>
 
       {/* Alerts row */}
@@ -57,7 +138,15 @@ function DashboardPage() {
             <Link to="/alerts"><Button variant="ghost" size="sm">All alerts <ArrowRight className="ml-1 size-3" /></Button></Link>
           </div>
           {certAlerts.length === 0 ? (
-            <div className="px-5 py-8 text-center text-sm text-muted-foreground">All certificates healthy.</div>
+            <EmptyState
+              icon={CheckCircle2}
+              title={isEmpty ? "No certificates yet" : "All certificates healthy"}
+              description={
+                isEmpty
+                  ? "As soon as an agent uploads TLS info, expiring certs will show up here."
+                  : "Nothing expiring soon — you're clear."
+              }
+            />
           ) : (
             <ul className="divide-y divide-border">
               {certAlerts.slice(0, 5).map((c: any) => (
@@ -80,7 +169,15 @@ function DashboardPage() {
             <Link to="/alerts"><Button variant="ghost" size="sm">Open <ArrowRight className="ml-1 size-3" /></Button></Link>
           </div>
           {notes.length === 0 ? (
-            <div className="px-5 py-8 text-center text-sm text-muted-foreground">No open alerts.</div>
+            <EmptyState
+              icon={CheckCircle2}
+              title="You're all caught up"
+              description={
+                isEmpty
+                  ? "Alerts will appear here once a PBX is connected and the agent detects an issue."
+                  : "No unacknowledged alerts across your fleet."
+              }
+            />
           ) : (
             <ul className="divide-y divide-border">
               {notes.map((n: any) => (
@@ -103,18 +200,25 @@ function DashboardPage() {
 
       <section className="rounded-xl border border-border bg-surface">
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Recent servers</h2>
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Your servers</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Each Asterisk host that has enrolled with AsterOps.</p>
+          </div>
           <Link to="/servers">
             <Button variant="ghost" size="sm">All servers <ArrowRight className="ml-1 size-3" /></Button>
           </Link>
         </div>
         {servers.length === 0 ? (
-          <div className="px-6 py-12 text-center">
-            <p className="text-sm text-muted-foreground">No servers yet.</p>
-            <Link to="/servers">
-              <Button className="mt-4">Register your first server</Button>
-            </Link>
-          </div>
+          <EmptyState
+            icon={Server}
+            title="No servers connected yet"
+            description="Follow the three steps above to enroll your first Asterisk PBX. It takes about a minute."
+            action={
+              <Link to="/servers">
+                <Button size="sm">Register a server</Button>
+              </Link>
+            }
+          />
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="border-b border-border bg-surface-2 text-xs uppercase tracking-wider text-muted-foreground">
@@ -144,7 +248,30 @@ function DashboardPage() {
   );
 }
 
-function StatCard({ label, value, icon: Icon, sub }: { label: string; value: string | number; icon: React.ComponentType<{ className?: string }>; sub?: string }) {
+type KpiTone = "ok" | "warn" | "err" | "neutral";
+
+function Kpi({
+  label,
+  value,
+  hint,
+  badge,
+  tone,
+  icon: Icon,
+}: {
+  label: string;
+  value: string | number;
+  hint: string;
+  badge: string;
+  tone: KpiTone;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  const toneStyles: Record<KpiTone, { dot: string; text: string; ring: string }> = {
+    ok: { dot: "bg-status-ok", text: "text-status-ok", ring: "ring-status-ok/20" },
+    warn: { dot: "bg-status-warn", text: "text-status-warn", ring: "ring-status-warn/20" },
+    err: { dot: "bg-status-err", text: "text-status-err", ring: "ring-status-err/20" },
+    neutral: { dot: "bg-muted-foreground", text: "text-muted-foreground", ring: "ring-border" },
+  };
+  const t = toneStyles[tone];
   return (
     <div className="rounded-xl border border-border bg-surface p-5">
       <div className="flex items-center justify-between">
@@ -152,7 +279,11 @@ function StatCard({ label, value, icon: Icon, sub }: { label: string; value: str
         <Icon className="size-4 text-muted-foreground" />
       </div>
       <div className="mt-3 font-mono text-3xl font-semibold tabular-nums text-foreground">{value}</div>
-      {sub && <div className="mt-1 text-xs text-muted-foreground">{sub}</div>}
+      <div className="mt-1 text-xs text-muted-foreground">{hint}</div>
+      <div className={`mt-3 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ${t.ring} ${t.text}`}>
+        <span className={`size-1.5 rounded-full ${t.dot}`} />
+        {badge}
+      </div>
     </div>
   );
 }
