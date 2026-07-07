@@ -16,8 +16,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Copy } from "lucide-react";
+import { Plus, Copy, Server } from "lucide-react";
 import { StatusPill } from "./Dashboard";
+import { EmptyState } from "@/components/empty-state";
 
 function ServersPage() {
   const fetch = useServerFn(listServers);
@@ -63,10 +64,13 @@ function ServersPage() {
 
       <div className="overflow-hidden rounded-xl border border-border bg-surface">
         {servers.length === 0 ? (
-          <div className="px-6 py-16 text-center">
-            <p className="text-sm text-muted-foreground">No servers registered yet.</p>
-            <Button className="mt-4" onClick={() => setOpen(true)}>Register your first server</Button>
-          </div>
+          <EmptyState
+            icon={Server}
+            title="No servers registered yet"
+            description="Add your first Asterisk PBX to AsterOps. You'll get a one-time enrollment token and a short install command to run on the host."
+            action={<Button onClick={() => setOpen(true)}><Plus className="mr-2 size-4" /> Register your first server</Button>}
+            hint="Takes about a minute per server."
+          />
         ) : (
           <table className="w-full text-left text-sm">
             <thead className="border-b border-border bg-surface-2 text-xs uppercase tracking-wider text-muted-foreground">

@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, ShieldAlert, Download, ExternalLink, RefreshCw } from "lucide-react";
+import { EmptyState } from "@/components/empty-state";
 
 type Report = {
   id: string;
@@ -70,16 +71,16 @@ export default function SecurityPage() {
 
       {latestList.length === 0 ? (
         <Card>
-          <CardHeader>
-            <CardTitle>No reports yet</CardTitle>
-            <CardDescription>
-              Install the AsterOps agent on a PBX and run <code className="font-mono">asterops report</code> to upload its first posture scan.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <pre className="rounded-lg bg-surface-2 p-4 text-xs font-mono overflow-x-auto">{`pip install asterops-agent
+          <CardContent className="pt-6">
+            <EmptyState
+              icon={ShieldCheck}
+              title="No security scans yet"
+              description="Once an enrolled agent uploads its first posture report, each PBX gets a hardening score and clear pass/fail cards for TLS, SRTP, firewall, fail2ban and AMI."
+              hint="Run `asterops report` on the host to send the first scan."
+            />
+            <pre className="mt-4 rounded-lg bg-surface-2 p-4 text-xs font-mono overflow-x-auto">{`pip install asterops-agent
 sudo asterops run --profile baseline
-asterops report --url https://your-control-plane/functions/v1 --token "$TOKEN"`}</pre>
+asterops report`}</pre>
           </CardContent>
         </Card>
       ) : (
