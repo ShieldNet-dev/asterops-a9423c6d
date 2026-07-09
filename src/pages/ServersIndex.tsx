@@ -152,29 +152,52 @@ function ServersPage() {
 
 function EnrollmentReveal({ token, serverId, onClose }: { token: string; serverId: string; onClose: () => void }) {
   const origin = typeof window !== "undefined" ? window.location.origin : "https://your-asterops.lovable.app";
-  const cmd = `curl -sSf https://asterops.io/install.sh \\
-  | sudo bash -s -- \\
-      --token ${token} \\
-      --url ${origin}`;
+  const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID as string | undefined;
+  const controlPlane = projectId
+    ? `https://${projectId}.functions.supabase.co`
+    : `${origin}/functions/v1`;
+  const cmd = `# 1. Install the agent on your Asterisk host (as root)
+sudo pip install --upgrade asterops-agent
+
+# 2. Point it at this control plane and your enrollment token
+export ASTEROPS_URL="${controlPlane}"
+export ASTEROPS_AGENT_TOKEN="${token}"
+
+# 3. Run a hardening + posture scan; the server will appear online here
+sudo -E asterops run --profile baseline
+sudo -E asterops report --url "$ASTEROPS_URL" --token "$ASTEROPS_AGENT_TOKEN"`;
   return (
     <>
       <DialogHeader>
         <DialogTitle>Server created</DialogTitle>
         <DialogDescription>
-          Run this on your Asterisk host. The enrollment token is shown only once.
+          Run these commands on your Asterisk host. The enrollment token is shown only once — copy it now.
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-3">
         <div className="overflow-hidden rounded-md border border-border bg-background">
           <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-foreground">{cmd}</pre>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => { navigator.clipboard.writeText(cmd); toast.success("Copied install command"); }}
-        >
-          <Copy className="mr-2 size-3" /> Copy command
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { navigator.clipboard.writeText(cmd); toast.success("Copied install commands"); }}
+          >
+            <Copy className="mr-2 size-3" /> Copy commands
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => { navigator.clipboard.writeText(token); toast.success("Copied enrollment token"); }}
+          >
+            <Copy className="mr-2 size-3" /> Copy token only
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          No Asterisk host handy? You can still explore the dashboard — this server will stay in{" "}
+          <span className="font-mono">pending</span> until an agent checks in.
+        </p>
       </div>
       <DialogFooter>
         <Link to={`/servers/${serverId}`}>
