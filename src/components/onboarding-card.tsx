@@ -66,8 +66,17 @@ export function OnboardingCard() {
           n={2}
           icon={Terminal}
           title="Install the agent on your PBX"
-          body="Run this once on the Asterisk host as root."
-          extra={<CopyBlock text={"pip install --upgrade asterops-agent"} />}
+          body="Install from the AsterOps source tree (the package is not on PyPI yet)."
+          extra={
+            <CopyBlock
+              text={`# On your Asterisk host (Ubuntu / Debian)
+sudo apt-get update
+sudo apt-get install -y python3-pip git
+git clone https://github.com/your-org/asterops.git
+cd asterops/agent
+sudo pip3 install --break-system-packages .`}
+            />
+          }
         />
         <Step
           n={3}

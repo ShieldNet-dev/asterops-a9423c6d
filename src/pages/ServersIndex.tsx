@@ -156,8 +156,13 @@ function EnrollmentReveal({ token, serverId, onClose }: { token: string; serverI
   const controlPlane = projectId
     ? `https://${projectId}.functions.supabase.co`
     : `${origin}/functions/v1`;
-  const cmd = `# 1. Install the agent on your Asterisk host (as root)
-sudo pip install --upgrade asterops-agent
+  const cmd = `# 1. Install the AsterOps agent on your Asterisk host
+#    (Ubuntu / Debian — the package is not on PyPI yet, install from source)
+sudo apt-get update
+sudo apt-get install -y python3-pip git
+git clone https://github.com/your-org/asterops.git
+cd asterops/agent
+sudo pip3 install --break-system-packages .
 
 # 2. Point it at this control plane and your enrollment token
 export ASTEROPS_URL="${controlPlane}"
