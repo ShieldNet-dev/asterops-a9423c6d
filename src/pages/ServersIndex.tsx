@@ -160,8 +160,8 @@ function EnrollmentReveal({ token, serverId, onClose }: { token: string; serverI
 #    (Ubuntu / Debian — the package is not on PyPI yet, install from source)
 sudo apt-get update
 sudo apt-get install -y python3-pip git
-git clone https://github.com/your-org/asterops.git
-cd asterops/agent
+git clone https://github.com/ShieldNet-dev/asterops-a9423c6d.git
+cd asterops-a9423c6d/agent
 sudo pip3 install --break-system-packages .
 
 # 2. Point it at this control plane and your enrollment token

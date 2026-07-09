@@ -72,8 +72,8 @@ export function OnboardingCard() {
               text={`# On your Asterisk host (Ubuntu / Debian)
 sudo apt-get update
 sudo apt-get install -y python3-pip git
-git clone https://github.com/your-org/asterops.git
-cd asterops/agent
+git clone https://github.com/ShieldNet-dev/asterops-a9423c6d.git
+cd asterops-a9423c6d/agent
 sudo pip3 install --break-system-packages .`}
             />
           }
