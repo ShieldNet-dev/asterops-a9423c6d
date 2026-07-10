@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { OnboardingCard } from "@/components/onboarding-card";
 import { EmptyState } from "@/components/empty-state";
+import { DemoPanel } from "@/components/demo-panel";
 
 function DashboardPage() {
   const fetchServers = useServerFn(listServers);
@@ -74,6 +75,8 @@ function DashboardPage() {
       </header>
 
       {isEmpty && <OnboardingCard />}
+      {/* Always show demo panel — lets the user seed/reset/simulate at any time */}
+      <DemoPanel />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Kpi
