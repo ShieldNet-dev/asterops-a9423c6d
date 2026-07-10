@@ -32,6 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
+import { DemoBadge } from "@/components/demo-panel";
 
 const PRIMARY = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -122,6 +123,7 @@ function Topbar() {
         ))}
       </nav>
       <div className="ml-auto flex items-center gap-2">
+        <DemoBadge />
         <Badge variant="outline" className="hidden md:inline-flex text-[10px] font-mono">
           <span className="mr-1.5 size-1.5 rounded-full bg-status-ok" /> Control plane online
         </Badge>
