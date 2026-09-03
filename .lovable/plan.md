@@ -1,51 +1,64 @@
-# Demo Mode — showcase AsterOps without a real Asterisk PBX
+# Production AsterOps implementation plan
 
-Goal: let you click one button and instantly populate the dashboard with realistic servers, calls, TLS certs, alerts, audit events, and posture data so every screen looks "live" for your professor demo and screenshots. No Asterisk, no VM, no agent required.
+## Goal
+Convert AsterOps from a demo-capable prototype into a production-only control plane for Vercel + Lovable Cloud. The dashboard will show only real fleet state, and every agent operation will have a complete, observable path from an Ubuntu host to the dashboard.
 
-## How it will work (user experience)
+## User-visible outcome
+- No demo panel, demo badge, seed/reset controls, simulated calls, or demo-tagged data paths remain in the production app.
+- The dashboard clearly distinguishes pending enrollment, live, stale, and offline servers using real heartbeats.
+- Operators can enroll an agent, receive security reports and CDRs, queue configuration/TLS work, and see success or failure in the dashboard.
+- Configured HTTPS webhooks receive real alert payloads. Every attempt is recorded against the originating certificate, TLS, SRTP, security, or reload alert.
+- Friendly setup, loading, empty, permission, and backend-error states remain available without hiding operational failures.
 
-1. A new **"Demo mode"** section appears at the top of the dashboard when your account has zero servers (and inside Settings once seeded).
-2. One button: **"Load demo data"** — seeds 3 fake servers, ~120 call records, TLS certs (one healthy, one expiring soon, one expired), a few unacked alerts, audit history, and provisioning inventory.
-3. A companion button **"Simulate live activity"** — every ~5s a background tick advances state: new calls appear, an agent goes offline, an alert fires, TLS days-remaining tick down. Perfect for a live demo / screen recording.
-4. A **"Reset demo data"** button wipes everything the demo created (tagged rows only — your real data is untouched).
-5. A subtle **"DEMO"** ribbon in the app shell whenever demo data is present, so screenshots are honest.
+## Implementation steps
 
-## What gets seeded (realistic, professor-friendly)
+1. **Establish a clean production baseline**
+   - Wait for Lovable Cloud to become active, then verify the live schema, policies, grants, and edge-function health before applying database changes.
+   - Remove the demo client library and its UI consumers from the dashboard and app shell. Do not delete or modify real customer rows; demo-tag cleanup will not be run as part of the conversion.
+   - Preserve the real onboarding card and production empty states so a new account is guided to its first server.
 
-- **3 servers**: `pbx-hq-01` (online, healthy), `pbx-branch-eu` (online, TLS expiring in 12d), `pbx-lab-02` (degraded, expired cert + fail2ban warning).
-- **Calls**: ~120 CDR rows across 24h with realistic extensions, durations, SRTP flags, answered/missed mix.
-- **TLS certs**: three rows matching the servers, one expired, one 12d, one 240d.
-- **Alerts / notifications**: 4 unacked (cert expiring, cert expired, brute-force blocked, AMI weak password), 6 acked.
-- **Audit events**: enrollment, config push, rollback, profile change.
-- **Provisioning inventory**: 8 endpoints + 2 trunks on `pbx-hq-01`.
-- **Posture check results**: mixed pass/warn/fail across TLS, SRTP, firewall, AMI, fail2ban.
+2. **Harden database access and data integrity**
+   - Add a forward migration with explicit Data API grants for every public table used by the SPA and service-role edge functions; the existing migration inventory has RLS policies but no grant statements.
+   - Recheck ownership policies for servers and every server-child table, immutable call/audit/delivery records, and agent-only writes performed through edge functions.
+   - Add or confirm constraints and indexes needed for server heartbeat lookups, notification delivery attempts, CDR time-range queries, and filtered audit exports.
+   - Keep the current single-account ownership model; do not introduce team roles or shared workspaces in this pass.
+   - Make client data functions return actionable errors consistently instead of converting failed production queries into empty success states.
 
-## Technical approach
+3. **Replace alert stubs with real webhook delivery**
+   - Add a server-side delivery path used by agent-generated alerts and the dashboard’s test-alert action; the browser will never call arbitrary webhook URLs directly.
+   - Validate and normalize configured HTTPS destinations, send a bounded JSON payload containing alert identity, severity, source kind, server, message, and metadata, and enforce request timeouts.
+   - Record queued/attempted/succeeded/failed outcomes, response status, error text, timestamps, and attempt number in `notification_deliveries`; retain the notification relationship so certificate/TLS/SRTP/reload failures are traceable.
+   - Add bounded retry/backoff for transient failures and make delivery idempotent for a notification/channel/attempt. Update the parent notification’s delivery summary only after the result is known.
+   - Update the Alert Log UI and test action to show the real result, not the current `client-stub`/`skipped` record.
 
-- **New edge function** `demo-seed` (service-role, JWT-verified for the calling user):
-  - `action: "seed"` — inserts rows tagged `is_demo = true` scoped to `auth.uid()` as owner.
-  - `action: "tick"` — advances one simulation step (new call row, decrement TLS days by 1, flip a status, maybe raise an alert).
-  - `action: "reset"` — deletes all rows where `is_demo = true` for this user.
-- **Migration**: add `is_demo boolean default false` to `servers`, `call_records`, `tls_certs`, `notifications`, `audit_events`, `endpoints`, `trunks`, `pjsip_configs`, `agent_reloads`. Existing RLS policies keep working; demo rows behave like any other row the user owns.
-- **Frontend**:
-  - `src/components/demo-panel.tsx` — the seed / simulate / reset UI (shown on Dashboard when empty, and as a small strip in the header once demo data exists).
-  - `src/lib/demo.functions.ts` — thin wrappers around the edge function.
-  - `src/components/app-shell.tsx` — add a small "DEMO" chip when the current user has any `is_demo` row.
-  - `useQuery` invalidation after each tick so KPIs, tables, alerts update visibly.
-- Simulation loop runs client-side (`setInterval` calling `tick`) so you can start/stop it from the UI — no cron needed.
+4. **Complete the agent lifecycle**
+   - Add a first-class `asterops enroll` command that exchanges the one-time enrollment token for an agent token, writes the local configuration with restrictive permissions, and refuses to overwrite an existing identity without an explicit rotation.
+   - Support both installation modes: documented GitHub source installation from `ShieldNet-dev/asterops-a9423c6d` and a release/publishing workflow for the Python package. Keep source installation usable even before the package is published.
+   - Add reliable agent configuration loading for the control-plane URL and token, structured request timeouts, response validation, useful CLI errors, and safe handling of interrupted enrollment/reporting.
+   - Implement the missing production collectors and workers: periodic heartbeat/status, batched Asterisk CDR upload with deduplication, pending PJSIP config fetch/apply acknowledgement, and pending TLS request handling with safe certificate validation and reload reporting.
+   - Make the systemd service/timer use the installed agent consistently and document upgrade/rollback behavior.
 
-## What won't change
+5. **Detect stale and offline servers**
+   - Add a scheduled server-health watchdog that evaluates `last_seen_at`, transitions servers to stale/degraded/offline according to explicit thresholds, and creates deduplicated alerts on state changes.
+   - Ensure a later heartbeat restores the server to online and records the transition in audit history.
+   - Surface last check-in time and the reason for each non-live status in Fleet, Dashboard, and server detail views.
 
-- No changes to the real agent flow, real enrollment, or existing edge functions.
-- Real (non-demo) rows are never touched by seed/reset.
-- No new secrets; uses existing Lovable Cloud auth.
+6. **Finish production UI behavior**
+   - Remove all simulation-related imports, queries, copy, status badges, and controls.
+   - Keep KPI calculations, calls, certificates, security posture, alerts, provisioning, and audit views backed only by current database rows.
+   - Add visible retry/error states for failed queries and mutations, while keeping empty states for genuinely empty production accounts.
+   - Ensure audit CSV export uses exactly the table’s active server, actor/role, action, and time filters, with no demo-only fields.
+   - Keep the existing light-first visual system and professional single-color text treatment intact while making status meaning clear through labels and semantic badges.
 
-## Deliverables
+7. **Vercel + Lovable Cloud release readiness**
+   - Verify the SPA build, Vercel rewrite behavior for React Router deep links, and required public Vite environment variables.
+   - Verify edge functions use runtime-managed secrets only and never expose service credentials to the browser or agent.
+   - Add a concise deployment and operations runbook covering Cloud activation, migrations, function health, Vercel environment configuration, agent enrollment, webhook testing, upgrades, and incident diagnosis.
 
-1. Migration adding `is_demo` flag + indexes.
-2. `demo-seed` edge function (seed / tick / reset).
-3. `DemoPanel` component + `demo.functions.ts`.
-4. Dashboard + AppShell integration (empty-state CTA, header chip, reset button).
-5. README note explaining Demo Mode for your report.
+## Technical validation
 
-After you approve, I'll implement it end-to-end. Then you just click **Load demo data → Simulate live activity** and screenshot every page.
+- Run the existing Python agent tests and add coverage for enrollment, HTTP error handling, CDR batching/deduplication, webhook delivery outcomes, heartbeat transitions, and production cleanup safeguards.
+- Run TypeScript typechecking, lint, and the Vite production build.
+- With Lovable Cloud active, verify RLS/grants through authenticated owner and unauthenticated/other-owner checks.
+- Exercise the complete path: create server → enroll Ubuntu agent → heartbeat online → upload report/CDR → queue config/TLS work → acknowledge success/failure → create alert → deliver webhook → inspect delivery log → stop heartbeat → observe offline transition.
+- Verify a fresh Vercel deployment loads `/`, `/login`, `/signup`, `/dashboard`, and nested routes after refresh.
