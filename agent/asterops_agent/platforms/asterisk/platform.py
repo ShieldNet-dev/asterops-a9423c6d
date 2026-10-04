@@ -94,8 +94,8 @@ class AsteriskPlatform(VoipPlatform):
         blocks.append(
             "[transport-tls]\ntype=transport\nprotocol=tls\nbind=0.0.0.0:5061\n"
             f"cert_file={inv.cert_file}\npriv_key_file={inv.priv_key_file}\n"
-            "method=tlsv1_2\nverify_client=no\nverify_server=no\n"
-            "require_client_cert=no\n"
+            "method=tlsv1_2\nverify_client=yes\nverify_server=yes\n"
+            "require_client_cert=yes\n"
         )
         return "\n".join(blocks)
 
