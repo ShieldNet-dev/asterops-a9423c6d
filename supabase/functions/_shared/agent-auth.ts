@@ -70,12 +70,62 @@ export async function fireAlert(
     meta?: Record<string, unknown>;
   },
 ) {
-  await admin.from("notifications").insert({
+  const { data: notification, error } = await admin.from("notifications").insert({
     server_id: input.serverId,
     kind: input.kind,
     severity: input.severity,
     title: input.title,
     message: input.message,
     meta: input.meta ?? {},
+  }).select("id, server_id, kind, severity, title, message, meta, created_at").single();
+  if (error || !notification) return;
+
+  const { data: server } = await admin
+    .from("servers")
+    .select("name, webhook_url")
+    .eq("id", input.serverId)
+    .maybeSingle();
+  if (!server?.webhook_url) return;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  let status = "failed";
+  let statusCode: number | null = null;
+  let errorText: string | null = null;
+  try {
+    const response = await fetch(server.webhook_url, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-asterops-event": input.kind },
+      body: JSON.stringify({
+        id: notification.id,
+        event: input.kind,
+        severity: input.severity,
+        title: input.title,
+        message: input.message,
+        meta: input.meta ?? {},
+        server: { id: input.serverId, name: server.name },
+        created_at: notification.created_at,
+      }),
+      signal: controller.signal,
+    });
+    statusCode = response.status;
+    status = response.ok ? "success" : "failed";
+    if (!response.ok) errorText = (await response.text()).slice(0, 1000);
+  } catch (e) {
+    errorText = e instanceof Error ? e.message.slice(0, 1000) : "Webhook request failed";
+  } finally {
+    clearTimeout(timeout);
+  }
+  await admin.from("notification_deliveries").insert({
+    notification_id: notification.id,
+    server_id: input.serverId,
+    channel: "webhook",
+    target: server.webhook_url,
+    status,
+    status_code: statusCode,
+    error: errorText,
   });
+  if (status === "success") {
+    await admin.from("notifications").update({ delivered_webhook: true }).eq("id", notification.id);
+  }
 }

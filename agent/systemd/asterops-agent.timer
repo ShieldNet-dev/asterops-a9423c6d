@@ -1,9 +1,9 @@
 [Unit]
-Description=Run AsterOps posture scan hourly
+Description=Run AsterOps posture scan every five minutes
 
 [Timer]
 OnBootSec=2min
-OnUnitActiveSec=1h
+OnUnitActiveSec=5min
 Unit=asterops-agent.service
 
 [Install]

@@ -129,16 +129,11 @@ export const sendTestAlert = createServerFn({ method: "POST" })
       .eq("id", data.server_id)
       .maybeSingle();
     if (!server?.webhook_url) return { ok: false, error: "No webhook configured" };
-    const { fireAlert } = await import("./alerts.server");
-    await fireAlert({
-      serverId: data.server_id,
-      kind: "test.ping",
-      severity: "info",
-      title: "AsterOps test alert",
-      message: "If you can read this, your webhook is wired up correctly.",
-      meta: { triggered_by: userId },
+    const { data: result, error } = await supabase.functions.invoke("send-test-alert", {
+      body: { server_id: data.server_id },
     });
-    return { ok: true, error: null };
+    if (error) return { ok: false, error: error.message };
+    return { ok: !!result?.ok, error: result?.error ?? null };
   });
 
 /**
