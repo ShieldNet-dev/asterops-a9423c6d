@@ -14,4 +14,4 @@ install -m 0644 "$(dirname "$0")/systemd/asterops-agent.service" /etc/systemd/sy
 install -m 0644 "$(dirname "$0")/systemd/asterops-agent.timer" /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable --now asterops-agent.timer
-echo "[OK] AsterOps agent installed. Edit /etc/asterops/agent.env then run: asterops run --profile baseline"
+echo "[OK] AsterOps agent installed. Run: ASTEROPS_URL=... ASTEROPS_ENROLLMENT_TOKEN=... asterops enroll"

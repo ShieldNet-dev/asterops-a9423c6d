@@ -33,7 +33,17 @@ export const listServers = createServerFn({ method: "GET" })
       .select("*")
       .order("created_at", { ascending: false });
     if (error) return { servers: [], error: error.message };
-    return { servers: data ?? [], error: null };
+    const now = Date.now();
+    const servers = (data ?? []).map((server: any) => {
+      if (!server.last_seen_at || server.status === "pending") return server;
+      const age = Math.max(0, Math.floor((now - new Date(server.last_seen_at).getTime()) / 1000));
+      return {
+        ...server,
+        status: age >= 600 ? "offline" : server.status === "degraded" ? "degraded" : age >= 60 ? "degraded" : "online",
+        heartbeat_age_sec: age,
+      };
+    });
+    return { servers, error: null };
   });
 
 export const getServer = createServerFn({ method: "POST" })

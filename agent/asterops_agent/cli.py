@@ -17,6 +17,7 @@ from .report.html_report import to_html
 from .report.json_report import to_json
 from .report.pdf_report import to_pdf
 from .report.upload import upload_report
+from .control_plane import config_path, enroll as enroll_agent, post_status
 
 console = Console()
 
@@ -43,6 +44,20 @@ def run(profile, dry_run, server_name, report_json, report_html, report_pdf):
     _print_checks(checks)
     console.print(f"\n[bold]Posture score:[/] [b]{report.score}[/]/100 — {report.passed} passed · {report.warnings} warnings · {report.failed} critical\n")
     _emit_reports(report, report_json, report_html, report_pdf)
+
+
+@main.command()
+@click.option("--url", envvar="ASTEROPS_URL", required=True, help="Dashboard control-plane URL.")
+@click.option("--token", envvar="ASTEROPS_ENROLLMENT_TOKEN", required=True, help="One-time enrollment token from the dashboard.")
+@click.option("--config-file", default=None, help="Agent env file path (default: /etc/asterops/agent.env).")
+@click.option("--force", is_flag=True, help="Replace an existing agent identity.")
+def enroll(url, token, config_file, force):
+    """Exchange a one-time dashboard token for a persistent agent identity."""
+    try:
+        enroll_agent(control_plane_url=url, enrollment_token=token, path=config_path(config_file), force=force)
+    except RuntimeError as exc:
+        raise click.ClickException(str(exc)) from exc
+    console.print("[green]Agent enrolled.[/] Credentials saved with mode 0600.")
 
 
 @main.command()
@@ -90,6 +105,7 @@ def report(profile, url, token, server_name):
     report, _, _ = run_hardening(prof, dry_run=True, server_name=server_name or socket.gethostname())
     html_text = to_html(report)
     ok = upload_report(report, control_plane_url=url, agent_token=token, report_html=html_text)
+    post_status(control_plane_url=url, agent_token=token, agent_version=__version__)
     if ok:
         console.print("[green]Report uploaded.[/]")
     else:
