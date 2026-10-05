@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.45.0";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -69,7 +69,7 @@ export async function fireAlert(
     message: string;
     meta?: Record<string, unknown>;
   },
-) {
+) : Promise<{ ok: boolean; error: string | null }> {
   const { data: notification, error } = await admin.from("notifications").insert({
     server_id: input.serverId,
     kind: input.kind,
@@ -78,14 +78,14 @@ export async function fireAlert(
     message: input.message,
     meta: input.meta ?? {},
   }).select("id, server_id, kind, severity, title, message, meta, created_at").single();
-  if (error || !notification) return;
+  if (error || !notification) return { ok: false, error: error?.message ?? "Could not create notification" };
 
   const { data: server } = await admin
     .from("servers")
     .select("name, webhook_url")
     .eq("id", input.serverId)
     .maybeSingle();
-  if (!server?.webhook_url) return;
+  if (!server?.webhook_url) return { ok: false, error: "No webhook configured" };
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8000);
@@ -128,4 +128,5 @@ export async function fireAlert(
   if (status === "success") {
     await admin.from("notifications").update({ delivered_webhook: true }).eq("id", notification.id);
   }
+  return { ok: status === "success", error: errorText };
 }
