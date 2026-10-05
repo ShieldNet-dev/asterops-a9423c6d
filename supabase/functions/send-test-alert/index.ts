@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
   if (!server) return json({ error: "server not found" }, 404);
   if (!server.webhook_url) return json({ error: "No webhook configured" }, 400);
 
-  await fireAlert(admin, {
+  const delivery = await fireAlert(admin, {
     serverId: server.id,
     kind: "test.ping",
     severity: "info",
@@ -36,5 +36,5 @@ Deno.serve(async (req) => {
     message: "If you can read this, your webhook is wired up correctly.",
     meta: { triggered_by: userData.user.id },
   });
-  return json({ ok: true });
+  return json(delivery, delivery.ok ? 200 : 502);
 });
